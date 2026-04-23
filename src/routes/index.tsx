@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoFestaFamilia from "@/assets/festa-da-familia-logo.png";
+import logoComvocacao from "@/assets/comvocacao-logo.jpeg";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -196,16 +196,16 @@ function Index() {
         <header className="mb-10 rounded-2xl border border-border bg-card p-5 sm:p-7 shadow-sm">
           <div className="flex items-start gap-5">
             <img
-              src={logoFestaFamilia}
-              alt="Festa da Família"
-              className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-border"
+              src={logoComvocacao}
+              alt="Comvocação"
+              className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-border"
             />
             <div className="min-w-0">
               <h1 className="text-2xl tracking-tight text-foreground font-extrabold sm:text-4xl">
-                Festa da Família
+                Comvocação
               </h1>
               <p className="text-sm sm:text-base mt-0.5 text-secondary font-medium">
-                Festa e Música que transformam
+                Festa em prol das vocações sacerdotais
               </p>
               <p className="text-sm mt-3 leading-relaxed text-secondary">
                 Preencha os dados com atenção. As informações serão utilizadas pela organização do evento.

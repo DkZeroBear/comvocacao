@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import logoUrl from "@/assets/festa-da-familia-logo.png";
+import logoUrl from "@/assets/comvocacao-logo.jpeg";
 
 export type Membro = { nome: string; funcao: string };
 export type Veiculo = { marca_modelo: string; cor: string; placa: string };
@@ -321,7 +321,7 @@ function renderSecurityView(
   rows: Credenciamento[]
 ) {
   const drawHead = () =>
-    drawHeader(doc, logo, "Festa da Família — Controle de Acesso", day);
+    drawHeader(doc, logo, "Comvocação — Controle de Acesso", day);
 
   doc.addPage();
   drawHead();

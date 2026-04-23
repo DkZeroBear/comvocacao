@@ -171,7 +171,7 @@ function Admin() {
 
     XLSX.writeFile(
       wb,
-      `credenciamentos-festa-da-familia-${new Date().toISOString().slice(0, 10)}.xlsx`
+      `credenciamentos-comvocacao-${new Date().toISOString().slice(0, 10)}.xlsx`
     );
   };
 

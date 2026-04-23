@@ -29,27 +29,23 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Festa da Família — Credenciamento" },
+      { title: "Comvocação — Credenciamento" },
       {
         name: "description",
         content:
-          "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam.",
+          "Formulário de credenciamento para a Comvocação. Festa em prol das vocações sacerdotais.",
       },
-      { property: "og:title", content: "Festa da Família — Credenciamento" },
+      { property: "og:title", content: "Comvocação — Credenciamento" },
       {
         property: "og:description",
         content:
-          "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam.",
+          "Formulário de credenciamento para a Comvocação. Festa em prol das vocações sacerdotais.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Festa da Família — Credenciamento" },
-      { name: "description", content: "Festa e Música que Transformam." },
-      { property: "og:description", content: "Festa e Música que Transformam." },
-      { name: "twitter:description", content: "Festa e Música que Transformam." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/udBDpJdqTHbYwhapRTxDCSwFHth1/social-images/social-1776957391278-festa-da-familia-logo.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/udBDpJdqTHbYwhapRTxDCSwFHth1/social-images/social-1776957391278-festa-da-familia-logo.webp" },
+      { name: "twitter:title", content: "Comvocação — Credenciamento" },
+      { name: "twitter:description", content: "Festa em prol das vocações sacerdotais." },
     ],
     links: [
       {
