@@ -218,15 +218,21 @@ function Index() {
           {/* Local do evento */}
           <section className="space-y-3">
             <SectionTitle>Local</SectionTitle>
-            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Concha+Ac%C3%BAstica+da+FITO+Av+das+Flores+701+Osasco+SP"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
               <MapPin className="shrink-0 mt-0.5 text-primary" size={22} aria-hidden="true" />
               <div className="min-w-0">
                 <p className="text-foreground font-semibold">Concha Acústica da FITO</p>
                 <p className="text-sm text-secondary mt-0.5">
                   Av. das Flores, 701 — Jardim das Flores, Osasco - SP
                 </p>
+                <p className="text-xs text-primary mt-1 font-medium">Abrir no Google Maps →</p>
               </div>
-            </div>
+            </a>
           </section>
 
           {/* Tipo de credenciamento — cards */}
