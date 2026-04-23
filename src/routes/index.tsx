@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoComvocacao from "@/assets/comvocacao-logo.jpeg";
 
