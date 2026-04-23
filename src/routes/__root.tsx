@@ -33,19 +33,23 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Formulário de credenciamento para a Comvocação. Festa em prol das vocações sacerdotais.",
+          "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam.",
       },
       { property: "og:title", content: "Comvocação — Credenciamento" },
       {
         property: "og:description",
         content:
-          "Formulário de credenciamento para a Comvocação. Festa em prol das vocações sacerdotais.",
+          "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Comvocação — Credenciamento" },
+      { name: "description", content: "Festa em prol das vocações sacerdotais." },
+      { property: "og:description", content: "Festa em prol das vocações sacerdotais." },
       { name: "twitter:description", content: "Festa em prol das vocações sacerdotais." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/udBDpJdqTHbYwhapRTxDCSwFHth1/social-images/social-1776959892632-WhatsApp_Image_2026-04-23_at_12.50.28.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/udBDpJdqTHbYwhapRTxDCSwFHth1/social-images/social-1776959892632-WhatsApp_Image_2026-04-23_at_12.50.28.webp" },
     ],
     links: [
       {
