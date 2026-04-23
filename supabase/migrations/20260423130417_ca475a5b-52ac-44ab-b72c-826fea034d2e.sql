@@ -1,0 +1,1 @@
+DELETE FROM public.credenciamentos WHERE id = '7bf0152d-0b9b-4e36-affc-0284214a16f5';
