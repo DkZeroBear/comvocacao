@@ -30,7 +30,7 @@ const COLOR_TEXT = "#3D2E14";
 const COLOR_BORDER = "#C8BC9E";
 const COLOR_HEADER_BG = "#F7F2E8";
 
-const DAYS = ["Dia 30", "Dia 31"] as const;
+const DAYS = ["Dia 15", "Dia 16"] as const;
 type Day = (typeof DAYS)[number];
 
 function isInDay(r: Credenciamento, day: Day): boolean {
@@ -401,16 +401,16 @@ export async function exportConvocacaoPdf(rows: Credenciamento[]) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const logo = await loadLogoDataUrl();
 
-  // Dia 30 — Organização
-  renderOrganizationView(doc, logo, "Dia 30", rows);
-  // Dia 30 — Segurança
-  renderSecurityView(doc, logo, "Dia 30", rows);
+  // Dia 15 — Organização
+  renderOrganizationView(doc, logo, "Dia 15", rows);
+  // Dia 15 — Segurança
+  renderSecurityView(doc, logo, "Dia 15", rows);
 
-  // Dia 31 — Organização
+  // Dia 16 — Organização
   doc.addPage();
-  renderOrganizationView(doc, logo, "Dia 31", rows);
-  // Dia 31 — Segurança
-  renderSecurityView(doc, logo, "Dia 31", rows);
+  renderOrganizationView(doc, logo, "Dia 16", rows);
+  // Dia 16 — Segurança
+  renderSecurityView(doc, logo, "Dia 16", rows);
 
   doc.save("credenciamento-comvocacao.pdf");
 }

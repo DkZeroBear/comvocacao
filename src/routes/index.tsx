@@ -42,7 +42,7 @@ const FUNCOES_BANDA = [
   "Fotógrafo/Videomaker",
   "Acompanhante",
 ];
-const DIAS = ["Dia 30", "Dia 31", "Ambos os dias"];
+const DIAS = ["Dia 15", "Dia 16", "Ambos os dias"];
 
 function maskPhone(v: string) {
   const d = v.replace(/\D/g, "").slice(0, 11);
