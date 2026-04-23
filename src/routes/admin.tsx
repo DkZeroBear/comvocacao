@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, ArrowLeft, LogOut } from "lucide-react";
+import { Download, ArrowLeft, LogOut, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import * as XLSX from "xlsx";
+import { exportConvocacaoPdf } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
@@ -202,6 +203,19 @@ function Admin() {
           <div className="flex gap-2">
             <Button onClick={exportXlsx} disabled={!rows.length}>
               <Download className="w-4 h-4 mr-2" /> Exportar Excel
+            </Button>
+            <Button
+              onClick={async () => {
+                try {
+                  await exportConvocacaoPdf(rows);
+                } catch (e) {
+                  console.error(e);
+                  toast.error("Erro ao gerar PDF");
+                }
+              }}
+              disabled={!rows.length}
+            >
+              <FileText className="w-4 h-4 mr-2" /> Exportar PDF
             </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" /> Sair
