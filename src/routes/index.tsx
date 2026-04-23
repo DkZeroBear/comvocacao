@@ -215,6 +215,20 @@ function Index() {
         </header>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+          {/* Local do evento */}
+          <section className="space-y-3">
+            <SectionTitle>Local</SectionTitle>
+            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+              <MapPin className="shrink-0 mt-0.5 text-primary" size={22} aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="text-foreground font-semibold">Concha Acústica da FITO</p>
+                <p className="text-sm text-secondary mt-0.5">
+                  Av. das Flores, 701 — Jardim das Flores, Osasco - SP
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* Tipo de credenciamento — cards */}
           <section className="space-y-4">
             <SectionTitle>Tipo de credenciamento</SectionTitle>
