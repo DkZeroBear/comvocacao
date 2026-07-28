@@ -98,12 +98,31 @@ function Admin() {
     toast.success("Cadastro excluído");
   };
 
-  const totalEquipe = rows.filter((r) => r.tipo === "equipe").length;
-  const totalBanda = rows.filter((r) => r.tipo === "banda").length;
-  const countDia = (dia: string) =>
-    rows.filter((r) =>
-      (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"))
-    ).length;
+  const isBanda = (r: Row) => (r.tipo || "").toLowerCase().includes("banda");
+  const inDia = (r: Row, dia: string) =>
+    (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"));
+
+  const totalEquipe = rows.filter((r) => !isBanda(r)).length;
+  const totalBanda = rows.filter((r) => isBanda(r)).length;
+  const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
+  const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
+
+  const filtered = rows.filter((r) => {
+    if (filtroTipo === "equipe" && isBanda(r)) return false;
+    if (filtroTipo === "banda" && !isBanda(r)) return false;
+    if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
+    const q = busca.trim().toLowerCase();
+    if (!q) return true;
+    const haystack = [
+      r.responsavel_nome,
+      r.nome_banda || "",
+      ...(r.membros || []).map((m) => m.nome),
+    ]
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(q);
+  });
+
 
 
   const exportXlsx = () => {
