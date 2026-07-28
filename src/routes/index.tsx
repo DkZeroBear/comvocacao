@@ -11,6 +11,7 @@ import {
   type FormValues,
 } from "@/components/CredenciamentoForm";
 import logoComvocacao from "@/assets/comvocacao-logo-2026.png.asset.json";
+import textura from "@/assets/comvocacao-textura.png.asset.json";
 
 export const Route = createFileRoute("/")({
   component: Index,
