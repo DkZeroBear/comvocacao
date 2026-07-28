@@ -10,7 +10,8 @@ import {
   buildPayload,
   type FormValues,
 } from "@/components/CredenciamentoForm";
-import logoComvocacao from "@/assets/comvocacao-logo.jpeg";
+import logoComvocacao from "@/assets/comvocacao-logo-2026.png.asset.json";
+import textura from "@/assets/comvocacao-textura.png.asset.json";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -58,10 +59,17 @@ function Index() {
     <div className="min-h-screen bg-background text-foreground">
       <Toaster />
       <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
-        <header className="mb-10 rounded-2xl border border-border bg-card p-5 sm:p-7 shadow-sm">
-          <div className="flex items-start gap-5">
+        <header className="mb-10 rounded-2xl border border-border overflow-hidden shadow-sm relative">
+          <div
+            className="absolute inset-0 opacity-25 bg-cover bg-center"
+            style={{ backgroundImage: `url(${textura.url})` }}
+            aria-hidden
+          />
+          <div className="absolute inset-0 bg-card/80" aria-hidden />
+          <div className="relative flex items-start gap-5 p-5 sm:p-7">
+
             <img
-              src={logoComvocacao}
+              src={logoComvocacao.url}
               alt="Comvocação"
               className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-border"
             />

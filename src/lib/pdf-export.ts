@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import logoUrl from "@/assets/comvocacao-logo.jpeg";
+import logoAsset from "@/assets/comvocacao-logo-2026.png.asset.json";
 
 export type Membro = { nome: string; funcao: string };
 export type Veiculo = { marca_modelo: string; cor: string; placa: string };
@@ -41,7 +41,7 @@ function isInDay(r: Credenciamento, day: Day): boolean {
 
 async function loadLogoDataUrl(): Promise<string | null> {
   try {
-    const res = await fetch(logoUrl);
+    const res = await fetch(logoAsset.url);
     const blob = await res.blob();
     return await new Promise((resolve) => {
       const reader = new FileReader();
