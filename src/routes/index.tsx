@@ -150,7 +150,7 @@ function Index() {
       nome_banda: isBanda ? values.nome_banda.trim() : null,
       horario_chegada: isBanda ? values.horario_chegada : null,
       membros: membrosFiltrados,
-      veiculos: isBanda ? values.veiculos.filter((v) => v.placa.trim() || v.marca_modelo.trim()) : [],
+      veiculos: values.veiculos.filter((v) => v.placa.trim() || v.marca_modelo.trim()),
     };
 
     const { error } = await supabase.from("credenciamentos").insert(payload);
@@ -187,6 +187,69 @@ function Index() {
   }
 
   const funcoes = tipo === "equipe" ? FUNCOES_EQUIPE : FUNCOES_BANDA;
+
+  const veiculosSection = (
+    <section className="space-y-4">
+      <SectionTitle>Veículos</SectionTitle>
+      <div className="space-y-3">
+        {veiculos.fields.map((f, i) => (
+          <div key={f.id} className="rounded-xl border border-border bg-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                Veículo {i + 1}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => veiculos.remove(i)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+            <div>
+              <Label className="text-sm">Marca / Modelo</Label>
+              <Input
+                placeholder="Ex: Volkswagen Gol"
+                {...form.register(`veiculos.${i}.marca_modelo`)}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-sm">Cor</Label>
+                <Input placeholder="Ex: Prata" {...form.register(`veiculos.${i}.cor`)} />
+              </div>
+              <div>
+                <Label className="text-sm">Placa</Label>
+                <Controller
+                  control={form.control}
+                  name={`veiculos.${i}.placa`}
+                  render={({ field }) => (
+                    <Input
+                      placeholder="ABC-1234 ou ABC1D23"
+                      maxLength={8}
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase().slice(0, 8))}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={() => veiculos.append({ marca_modelo: "", cor: "", placa: "" })}
+      >
+        <Plus className="w-4 h-4 mr-1" /> Adicionar veículo
+      </Button>
+    </section>
+  );
+
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -359,6 +422,9 @@ function Index() {
             </section>
           )}
 
+          {tipo === "equipe" && veiculosSection}
+
+
           {/* Banda flow */}
           {tipo === "banda" && (
             <>
@@ -457,71 +523,8 @@ function Index() {
               </section>
 
               {/* Veículos */}
-              <section className="space-y-4">
-                <SectionTitle>Veículos</SectionTitle>
-                <div className="space-y-3">
-                  {veiculos.fields.map((f, i) => (
-                    <div key={f.id} className="rounded-xl border border-border bg-card p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                          Veículo {i + 1}
-                        </span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => veiculos.remove(i)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      <div>
-                        <Label className="text-sm">Marca / Modelo</Label>
-                        <Input
-                          placeholder="Ex: Volkswagen Gol"
-                          {...form.register(`veiculos.${i}.marca_modelo`)}
-                        />
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <Label className="text-sm">Cor</Label>
-                          <Input
-                            placeholder="Ex: Prata"
-                            {...form.register(`veiculos.${i}.cor`)}
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-sm">Placa</Label>
-                          <Controller
-                            control={form.control}
-                            name={`veiculos.${i}.placa`}
-                            render={({ field }) => (
-                              <Input
-                                placeholder="ABC-1234"
-                                maxLength={8}
-                                value={field.value}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    e.target.value.toUpperCase().slice(0, 8)
-                                  )
-                                }
-                              />
-                            )}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => veiculos.append({ marca_modelo: "", cor: "", placa: "" })}
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Adicionar veículo
-                </Button>
-              </section>
+              {veiculosSection}
+
 
               {/* Membros */}
               <section className="space-y-4">

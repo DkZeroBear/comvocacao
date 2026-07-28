@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, ArrowLeft, LogOut, FileText } from "lucide-react";
+import { Download, ArrowLeft, LogOut, FileText, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import * as XLSX from "xlsx";
@@ -85,6 +85,26 @@ function Admin() {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
   };
+
+  const handleDelete = async (r: Row) => {
+    const nome = r.nome_banda || r.responsavel_nome;
+    if (!window.confirm(`Excluir cadastro de ${nome}?`)) return;
+    const { error } = await supabase.from("credenciamentos").delete().eq("id", r.id);
+    if (error) {
+      toast.error("Erro ao excluir cadastro");
+      return;
+    }
+    setRows((prev) => prev.filter((x) => x.id !== r.id));
+    toast.success("Cadastro excluído");
+  };
+
+  const totalEquipe = rows.filter((r) => r.tipo === "equipe").length;
+  const totalBanda = rows.filter((r) => r.tipo === "banda").length;
+  const countDia = (dia: string) =>
+    rows.filter((r) =>
+      (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"))
+    ).length;
+
 
   const exportXlsx = () => {
     const main = rows.map((r) => ({
@@ -197,7 +217,9 @@ function Admin() {
             </Link>
             <h1 className="text-2xl font-bold">Credenciamentos recebidos</h1>
             <p className="text-sm text-muted-foreground">
-              {rows.length} {rows.length === 1 ? "registro" : "registros"}
+              {rows.length} {rows.length === 1 ? "credenciamento" : "credenciamentos"} ·{" "}
+              {totalEquipe} Equipe · {totalBanda} Banda · Dia 15: {countDia("15")} · Dia 16:{" "}
+              {countDia("16")}
             </p>
           </div>
           <div className="flex gap-2">
@@ -251,9 +273,20 @@ function Admin() {
                       </p>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(r.created_at).toLocaleString("pt-BR")}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleString("pt-BR")}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label="Excluir cadastro"
+                      onClick={() => handleDelete(r)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+
                 </div>
 
                 {r.membros && r.membros.length > 0 && (
