@@ -338,6 +338,11 @@ function Admin() {
                     <span className="text-xs text-muted-foreground">
                       {new Date(r.created_at).toLocaleString("pt-BR")}
                     </span>
+                    <Button variant="ghost" size="sm" aria-label="Editar cadastro" asChild>
+                      <Link to="/admin/edit/$id" params={{ id: r.id }}>
+                        <Pencil className="w-4 h-4" />
+                      </Link>
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
