@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, ArrowLeft, LogOut, FileText, Trash2 } from "lucide-react";
+import { Download, ArrowLeft, LogOut, FileText, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import * as XLSX from "xlsx";
 import { exportConvocacaoPdf } from "@/lib/pdf-export";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/admin/")({
   component: Admin,
 });
 
@@ -338,6 +338,11 @@ function Admin() {
                     <span className="text-xs text-muted-foreground">
                       {new Date(r.created_at).toLocaleString("pt-BR")}
                     </span>
+                    <Button variant="ghost" size="sm" aria-label="Editar cadastro" asChild>
+                      <Link to="/admin/edit/$id" params={{ id: r.id }}>
+                        <Pencil className="w-4 h-4" />
+                      </Link>
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
