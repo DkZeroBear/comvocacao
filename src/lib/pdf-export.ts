@@ -182,6 +182,26 @@ function renderOrganizationView(
     y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
   }
 
+  // Veículos da equipe (consolidado) — omitido quando não há veículos
+  const equipeVeiculos = equipes.flatMap((r) => r.veiculos || []);
+  if (equipeVeiculos.length > 0) {
+    y = ensureSpace(doc, y, 18, drawHead);
+    autoTable(doc, {
+      ...tableTheme(),
+      startY: y,
+      head: [["Marca / Modelo", "Cor", "Placa"]],
+      body: equipeVeiculos.map((v) => [
+        v.marca_modelo || "—",
+        v.cor || "—",
+        v.placa || "—",
+      ]),
+      margin: { left: 14, right: 14 },
+      didDrawPage: drawHead,
+    });
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+  }
+
+
   // Bandas / Artistas
   y = ensureSpace(doc, y, 12, drawHead);
   y = sectionTitle(doc, "Bandas / Artistas", y);
