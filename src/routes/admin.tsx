@@ -35,6 +35,10 @@ function Admin() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+  const [busca, setBusca] = useState("");
+  const [filtroTipo, setFiltroTipo] = useState("todos");
+  const [filtroDia, setFiltroDia] = useState("todos");
+
 
   useEffect(() => {
     let active = true;
