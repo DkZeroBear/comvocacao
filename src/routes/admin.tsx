@@ -240,10 +240,13 @@ function Admin() {
             </Link>
             <h1 className="text-2xl font-bold">Credenciamentos recebidos</h1>
             <p className="text-sm text-muted-foreground">
-              {rows.length} {rows.length === 1 ? "credenciamento" : "credenciamentos"} ·{" "}
-              {totalEquipe} Equipe · {totalBanda} Banda · Dia 15: {countDia("15")} · Dia 16:{" "}
-              {countDia("16")}
+              {filtered.length !== rows.length
+                ? `${filtered.length} de ${rows.length} credenciamentos`
+                : `${rows.length} ${rows.length === 1 ? "credenciamento" : "credenciamentos"}`}{" "}
+              · {totalEquipe} Equipe · {totalBanda} Banda · Dia 15: {countDia("15")} · Dia 16:{" "}
+              {countDia("16")} · Qtd. veículos: {totalVeiculos}
             </p>
+
           </div>
           <div className="flex gap-2">
             <Button onClick={exportXlsx} disabled={!rows.length}>
