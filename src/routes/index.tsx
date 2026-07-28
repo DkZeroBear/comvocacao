@@ -359,6 +359,9 @@ function Index() {
             </section>
           )}
 
+          {tipo === "equipe" && veiculosSection}
+
+
           {/* Banda flow */}
           {tipo === "banda" && (
             <>
