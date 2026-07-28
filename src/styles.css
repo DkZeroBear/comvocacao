@@ -87,14 +87,14 @@
   --chart-3: oklch(0.45 0.06 60);
   --chart-4: oklch(0.6 0.1 80);
   --chart-5: oklch(0.4 0.05 250);
-  --sidebar: #F4F9F1;
-  --sidebar-foreground: #0F2E15;
-  --sidebar-primary: #1F8A3C;
-  --sidebar-primary-foreground: #F4F9F1;
-  --sidebar-accent: #C8E0BD;
-  --sidebar-accent-foreground: #0F2E15;
-  --sidebar-border: #B8D0AE;
-  --sidebar-ring: #1F8A3C;
+  --sidebar: #FBF8F1;
+  --sidebar-foreground: #123A52;
+  --sidebar-primary: #1B6F99;
+  --sidebar-primary-foreground: #FBF8F1;
+  --sidebar-accent: #E3B25A;
+  --sidebar-accent-foreground: #123A52;
+  --sidebar-border: #D6CAB0;
+  --sidebar-ring: #1B6F99;
 }
 
 .dark {
@@ -145,10 +145,10 @@
   }
 
   input, textarea, select {
-    color: #143A1C;
+    color: #123A52;
   }
 
   input::placeholder, textarea::placeholder {
-    color: #7A9A80;
+    color: #8798A3;
   }
 }

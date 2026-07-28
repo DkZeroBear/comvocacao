@@ -10,7 +10,7 @@ import {
   buildPayload,
   type FormValues,
 } from "@/components/CredenciamentoForm";
-import logoComvocacao from "@/assets/comvocacao-logo.jpeg";
+import logoComvocacao from "@/assets/comvocacao-logo-2026.png.asset.json";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -61,7 +61,7 @@ function Index() {
         <header className="mb-10 rounded-2xl border border-border bg-card p-5 sm:p-7 shadow-sm">
           <div className="flex items-start gap-5">
             <img
-              src={logoComvocacao}
+              src={logoComvocacao.url}
               alt="Comvocação"
               className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-border"
             />
