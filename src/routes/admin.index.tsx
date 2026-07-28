@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import * as XLSX from "xlsx";
 import { exportConvocacaoPdf } from "@/lib/pdf-export";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/admin/")({
   component: Admin,
 });
 
