@@ -150,7 +150,7 @@ function Index() {
       nome_banda: isBanda ? values.nome_banda.trim() : null,
       horario_chegada: isBanda ? values.horario_chegada : null,
       membros: membrosFiltrados,
-      veiculos: isBanda ? values.veiculos.filter((v) => v.placa.trim() || v.marca_modelo.trim()) : [],
+      veiculos: values.veiculos.filter((v) => v.placa.trim() || v.marca_modelo.trim()),
     };
 
     const { error } = await supabase.from("credenciamentos").insert(payload);
