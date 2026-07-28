@@ -35,6 +35,10 @@ function Admin() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+  const [busca, setBusca] = useState("");
+  const [filtroTipo, setFiltroTipo] = useState("todos");
+  const [filtroDia, setFiltroDia] = useState("todos");
+
 
   useEffect(() => {
     let active = true;
@@ -98,12 +102,31 @@ function Admin() {
     toast.success("Cadastro excluído");
   };
 
-  const totalEquipe = rows.filter((r) => r.tipo === "equipe").length;
-  const totalBanda = rows.filter((r) => r.tipo === "banda").length;
-  const countDia = (dia: string) =>
-    rows.filter((r) =>
-      (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"))
-    ).length;
+  const isBanda = (r: Row) => (r.tipo || "").toLowerCase().includes("banda");
+  const inDia = (r: Row, dia: string) =>
+    (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"));
+
+  const totalEquipe = rows.filter((r) => !isBanda(r)).length;
+  const totalBanda = rows.filter((r) => isBanda(r)).length;
+  const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
+  const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
+
+  const filtered = rows.filter((r) => {
+    if (filtroTipo === "equipe" && isBanda(r)) return false;
+    if (filtroTipo === "banda" && !isBanda(r)) return false;
+    if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
+    const q = busca.trim().toLowerCase();
+    if (!q) return true;
+    const haystack = [
+      r.responsavel_nome,
+      r.nome_banda || "",
+      ...(r.membros || []).map((m) => m.nome),
+    ]
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(q);
+  });
+
 
 
   const exportXlsx = () => {
@@ -217,10 +240,13 @@ function Admin() {
             </Link>
             <h1 className="text-2xl font-bold">Credenciamentos recebidos</h1>
             <p className="text-sm text-muted-foreground">
-              {rows.length} {rows.length === 1 ? "credenciamento" : "credenciamentos"} ·{" "}
-              {totalEquipe} Equipe · {totalBanda} Banda · Dia 15: {countDia("15")} · Dia 16:{" "}
-              {countDia("16")}
+              {filtered.length !== rows.length
+                ? `${filtered.length} de ${rows.length} credenciamentos`
+                : `${rows.length} ${rows.length === 1 ? "credenciamento" : "credenciamentos"}`}{" "}
+              · {totalEquipe} Equipe · {totalBanda} Banda · Dia 15: {countDia("15")} · Dia 16:{" "}
+              {countDia("16")} · Qtd. veículos: {totalVeiculos}
             </p>
+
           </div>
           <div className="flex gap-2">
             <Button onClick={exportXlsx} disabled={!rows.length}>
@@ -245,16 +271,51 @@ function Admin() {
           </div>
         </div>
 
+        <div className="flex flex-wrap gap-2 mb-6">
+          <input
+            type="text"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar por responsável, banda ou membro..."
+            className="flex-1 min-w-[220px] h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+          <select
+            value={filtroTipo}
+            onChange={(e) => setFiltroTipo(e.target.value)}
+            aria-label="Filtrar por tipo"
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="todos">Todos os tipos</option>
+            <option value="equipe">Equipe</option>
+            <option value="banda">Banda</option>
+          </select>
+          <select
+            value={filtroDia}
+            onChange={(e) => setFiltroDia(e.target.value)}
+            aria-label="Filtrar por dia"
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="todos">Todos os dias</option>
+            <option value="15">Dia 15</option>
+            <option value="16">Dia 16</option>
+          </select>
+        </div>
+
         {loading ? (
           <p className="text-muted-foreground">Carregando...</p>
         ) : rows.length === 0 ? (
           <Card className="p-8 text-center text-muted-foreground">
             Nenhum credenciamento recebido ainda.
           </Card>
+        ) : filtered.length === 0 ? (
+          <Card className="p-8 text-center text-muted-foreground">
+            Nenhum resultado para os filtros aplicados.
+          </Card>
         ) : (
           <div className="space-y-3">
-            {rows.map((r) => (
+            {filtered.map((r) => (
               <Card key={r.id} className="p-4 space-y-3">
+
                 <div className="flex justify-between items-start gap-4 flex-wrap">
                   <div>
                     <p className="font-semibold">
