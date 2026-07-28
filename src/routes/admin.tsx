@@ -86,6 +86,26 @@ function Admin() {
     navigate({ to: "/login" });
   };
 
+  const handleDelete = async (r: Row) => {
+    const nome = r.nome_banda || r.responsavel_nome;
+    if (!window.confirm(`Excluir cadastro de ${nome}?`)) return;
+    const { error } = await supabase.from("credenciamentos").delete().eq("id", r.id);
+    if (error) {
+      toast.error("Erro ao excluir cadastro");
+      return;
+    }
+    setRows((prev) => prev.filter((x) => x.id !== r.id));
+    toast.success("Cadastro excluído");
+  };
+
+  const totalEquipe = rows.filter((r) => r.tipo === "equipe").length;
+  const totalBanda = rows.filter((r) => r.tipo === "banda").length;
+  const countDia = (dia: string) =>
+    rows.filter((r) =>
+      (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"))
+    ).length;
+
+
   const exportXlsx = () => {
     const main = rows.map((r) => ({
       ID: r.id,
