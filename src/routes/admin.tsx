@@ -271,9 +271,20 @@ function Admin() {
                       </p>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(r.created_at).toLocaleString("pt-BR")}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleString("pt-BR")}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label="Excluir cadastro"
+                      onClick={() => handleDelete(r)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+
                 </div>
 
                 {r.membros && r.membros.length > 0 && (
