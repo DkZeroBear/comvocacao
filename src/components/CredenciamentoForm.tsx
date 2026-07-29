@@ -220,13 +220,20 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
     if (!values.dias.length) return toast.error("Selecione ao menos um dia de presença.");
 
     const isBanda = values.tipo === "banda";
+    const comResponsavel = temResponsavel(values.tipo);
 
-    if (isBanda) {
+    if (comResponsavel) {
       if (!values.responsavel_nome.trim()) return toast.error("Informe o nome do responsável.");
       if (!values.responsavel_whatsapp.trim())
         return toast.error("Informe o WhatsApp do responsável.");
-      if (!values.eh_produtor) return toast.error("Informe se é produtor(a).");
+      if (!values.eh_produtor)
+        return toast.error(
+          isBanda ? "Informe se é produtor(a)." : "Informe se é assessor(a) do prefeito."
+        );
       if (!values.pode_contatar) return toast.error("Informe se podemos entrar em contato.");
+    }
+
+    if (isBanda) {
       if (!values.nome_banda.trim()) return toast.error("Informe o nome da banda ou artista.");
       if (!values.horario_chegada) return toast.error("Informe o horário previsto de chegada.");
       if (!values.quantidade_pessoas || Number(values.quantidade_pessoas) < 1)
@@ -235,9 +242,11 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       return toast.error("Selecione o setor da equipe.");
     }
 
+    const membrosPreenchidos = values.membros.filter((m) => m.nome.trim());
+    if (!membrosPreenchidos.length) return toast.error("Adicione ao menos um membro.");
 
-    if (!values.membros.filter((m) => m.nome.trim()).length)
-      return toast.error("Adicione ao menos um membro.");
+    if (membroTemWhatsapp(values.tipo) && membrosPreenchidos.some((m) => !(m.whatsapp ?? "").trim()))
+      return toast.error("Informe o WhatsApp ou contato de emergência de cada membro.");
 
     await onSubmit(values);
   };
