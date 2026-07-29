@@ -19,6 +19,7 @@ export const Route = createFileRoute("/admin/edit/$id")({
 type Row = {
   id: string;
   tipo: string;
+  setor: string | null;
   dias: string[];
   responsavel_nome: string;
   responsavel_whatsapp: string;
