@@ -104,7 +104,7 @@ export const emptyFormValues: FormValues = {
   nome_banda: "",
   horario_chegada: "",
   veiculos: [],
-  membros: [{ nome: "", funcao: "" }],
+  membros: [{ nome: "", funcao: "", whatsapp: "" }],
 };
 
 
