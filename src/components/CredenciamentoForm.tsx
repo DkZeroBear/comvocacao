@@ -396,17 +396,31 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
             <Label className="text-sm">
               Setor da equipe <span className="text-destructive">*</span>
             </Label>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
-              {...form.register("setor")}
-            >
-              <option value="">Selecione...</option>
-              {SETORES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={form.control}
+              name="setor"
+              render={({ field }) => (
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                  value={field.value}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    // a lista de funções muda por setor: limpa seleções anteriores
+                    form.getValues("membros").forEach((_, i) => {
+                      form.setValue(`membros.${i}.funcao`, "");
+                    });
+                  }}
+                >
+                  <option value="">Selecione...</option>
+                  {SETORES.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+
           </div>
         </section>
       )}
