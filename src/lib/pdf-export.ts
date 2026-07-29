@@ -144,6 +144,102 @@ function tableTheme() {
   };
 }
 
+const SETORES_PDF: Array<{ value: string; label: string }> = [
+  { value: "palco", label: "Equipe Palco" },
+  { value: "camarim", label: "Equipe Camarim" },
+  { value: "tecnica", label: "Equipe Técnica" },
+  { value: "press", label: "Equipe Press" },
+];
+
+const getFinalY = (doc: jsPDF) =>
+  (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
+
+/**
+ * Renderiza um grupo de registros (equipe/setor, prefeitura, comissão):
+ * tabela de membros + veículos + qtd. estimada x cadastrada + observações.
+ * `funcaoHeader` = null omite a coluna de função/cargo.
+ */
+function renderGrupo(
+  doc: jsPDF,
+  yStart: number,
+  drawHead: () => void,
+  label: string,
+  registros: Credenciamento[],
+  funcaoHeader: string | null
+): number {
+  let y = ensureSpace(doc, yStart, 20, drawHead);
+  y = sectionTitle(doc, label, y);
+
+  const membrosBody = registros.flatMap((r) =>
+    (r.membros || []).map((m) =>
+      funcaoHeader ? [m.nome || "—", m.funcao || "—"] : [m.nome || "—"]
+    )
+  );
+  if (membrosBody.length > 0) {
+    autoTable(doc, {
+      ...tableTheme(),
+      startY: y,
+      head: [funcaoHeader ? ["Nome completo", funcaoHeader] : ["Nome completo"]],
+      body: membrosBody,
+      margin: { left: 14, right: 14 },
+      didDrawPage: drawHead,
+    });
+    y = getFinalY(doc) + 6;
+  }
+
+  const veics = registros.flatMap((r) => r.veiculos || []);
+  if (veics.length > 0) {
+    y = ensureSpace(doc, y, 18, drawHead);
+    autoTable(doc, {
+      ...tableTheme(),
+      startY: y,
+      head: [["Marca / Modelo", "Cor", "Placa"]],
+      body: veics.map((v) => [v.marca_modelo || "—", v.cor || "—", v.placa || "—"]),
+      margin: { left: 14, right: 14 },
+      didDrawPage: drawHead,
+    });
+    y = getFinalY(doc) + 6;
+  }
+
+  // Quantidade estimada x cadastrada
+  y = ensureSpace(doc, y, 8, drawHead);
+  const qtdEst = registros.reduce((a, r) => a + (r.quantidade_pessoas ?? 0), 0);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(COLOR_LABEL);
+  doc.text("Qtd. estimada:", 16, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(COLOR_TEXT);
+  doc.text(String(qtdEst), 46, y);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(COLOR_LABEL);
+  doc.text("Qtd. cadastrada:", 84, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(COLOR_TEXT);
+  doc.text(String(membrosBody.length), 119, y);
+  y += 6;
+
+  // Observações
+  const obs = registros
+    .map((r) => r.observacoes?.trim())
+    .filter(Boolean)
+    .join(" | ");
+  if (obs) {
+    y = ensureSpace(doc, y, 12, drawHead);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(COLOR_LABEL);
+    doc.text("Observações / Restrições alimentares:", 16, y);
+    y += 4;
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(COLOR_TEXT);
+    const obsLines = doc.splitTextToSize(obs, doc.internal.pageSize.getWidth() - 32);
+    y = ensureSpace(doc, y, obsLines.length * 4 + 4, drawHead);
+    doc.text(obsLines, 16, y);
+    y += obsLines.length * 4;
+  }
+  return y + 6;
+}
+
 function renderOrganizationView(
   doc: jsPDF,
   logo: string | null,
@@ -151,8 +247,10 @@ function renderOrganizationView(
   rows: Credenciamento[]
 ) {
   const dayRows = rows.filter((r) => isInDay(r, day));
-  const equipes = dayRows.filter((r) => r.tipo !== "Banda / Artista");
+  const equipes = dayRows.filter((r) => r.tipo === "Equipe");
   const bandas = dayRows.filter((r) => r.tipo === "Banda / Artista");
+  const prefeitura = dayRows.filter((r) => r.tipo === "Prefeitura / Convidados");
+  const comissao = dayRows.filter((r) => r.tipo === "Comissão Organizadora");
 
   const drawHead = () =>
     drawHeader(doc, logo, "ComVocação", day);
@@ -161,17 +259,6 @@ function renderOrganizationView(
   let y = 40;
 
   // Equipes agrupadas por setor
-  const SETORES_PDF: Array<{ value: string; label: string }> = [
-    { value: "palco", label: "Equipe Palco" },
-    { value: "camarim", label: "Equipe Camarim" },
-    { value: "tecnica", label: "Equipe Técnica" },
-    { value: "press", label: "Equipe Press" },
-    
-  ];
-
-  const getFinalY = () =>
-    (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
-
   const semSetor = equipes.filter((r) => !r.setor);
   const grupos = [
     ...SETORES_PDF.map((s) => ({
@@ -182,76 +269,9 @@ function renderOrganizationView(
   ].filter((g) => g.registros.length > 0);
 
   for (const grupo of grupos) {
-    y = ensureSpace(doc, y, 20, drawHead);
-    y = sectionTitle(doc, grupo.label, y);
-
-    const membrosBody = grupo.registros.flatMap((r) =>
-      (r.membros || []).map((m) => [m.nome || "—", m.funcao || "—"])
-    );
-    if (membrosBody.length > 0) {
-      autoTable(doc, {
-        ...tableTheme(),
-        startY: y,
-        head: [["Nome completo", "Função"]],
-        body: membrosBody,
-        margin: { left: 14, right: 14 },
-        didDrawPage: drawHead,
-      });
-      y = getFinalY() + 6;
-    }
-
-    const veics = grupo.registros.flatMap((r) => r.veiculos || []);
-    if (veics.length > 0) {
-      y = ensureSpace(doc, y, 18, drawHead);
-      autoTable(doc, {
-        ...tableTheme(),
-        startY: y,
-        head: [["Marca / Modelo", "Cor", "Placa"]],
-        body: veics.map((v) => [v.marca_modelo || "—", v.cor || "—", v.placa || "—"]),
-        margin: { left: 14, right: 14 },
-        didDrawPage: drawHead,
-      });
-      y = getFinalY() + 6;
-    }
-
-    // Quantidade estimada x cadastrada
-    y = ensureSpace(doc, y, 8, drawHead);
-    const qtdEst = grupo.registros.reduce((a, r) => a + (r.quantidade_pessoas ?? 0), 0);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(COLOR_LABEL);
-    doc.text("Qtd. estimada:", 16, y);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(COLOR_TEXT);
-    doc.text(String(qtdEst), 46, y);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(COLOR_LABEL);
-    doc.text("Qtd. cadastrada:", 84, y);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(COLOR_TEXT);
-    doc.text(String(membrosBody.length), 119, y);
-    y += 6;
-
-    // Observações
-    const obs = grupo.registros
-      .map((r) => r.observacoes?.trim())
-      .filter(Boolean)
-      .join(" | ");
-    if (obs) {
-      y = ensureSpace(doc, y, 12, drawHead);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(COLOR_LABEL);
-      doc.text("Observações / Restrições alimentares:", 16, y);
-      y += 4;
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(COLOR_TEXT);
-      const obsLines = doc.splitTextToSize(obs, doc.internal.pageSize.getWidth() - 32);
-      y = ensureSpace(doc, y, obsLines.length * 4 + 4, drawHead);
-      doc.text(obsLines, 16, y);
-      y += obsLines.length * 4;
-    }
-    y += 6;
+    y = renderGrupo(doc, y, drawHead, grupo.label, grupo.registros, "Função");
   }
+
 
 
 
