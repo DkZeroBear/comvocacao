@@ -299,7 +299,9 @@ function Admin() {
           >
             <option value="todos">Todos os tipos</option>
             <option value="equipe">Equipe</option>
-            <option value="banda">Banda</option>
+            <option value="banda">Banda / Artista</option>
+            <option value="prefeitura">Prefeitura / Convidados</option>
+            <option value="comissao">Comissão Organizadora</option>
           </select>
           <select
             value={filtroDia}
