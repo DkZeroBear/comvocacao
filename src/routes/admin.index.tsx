@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import * as XLSX from "xlsx";
 import { exportConvocacaoPdf } from "@/lib/pdf-export";
+import { setorLabel } from "@/components/CredenciamentoForm";
 
 export const Route = createFileRoute("/admin/")({
   component: Admin,
@@ -17,6 +18,7 @@ type Row = {
   id: string;
   created_at: string;
   tipo: string;
+  setor: string | null;
   dias: string[];
   responsavel_nome: string;
   responsavel_whatsapp: string;
@@ -134,6 +136,7 @@ function Admin() {
       ID: r.id,
       "Data de envio": new Date(r.created_at).toLocaleString("pt-BR"),
       Tipo: r.tipo,
+      Setor: setorLabel(r.setor),
       "Dias de presença": (r.dias || []).join(", "),
       "Responsável - Nome": r.responsavel_nome,
       "Responsável - WhatsApp": r.responsavel_whatsapp,
@@ -184,6 +187,7 @@ function Admin() {
         ID: r.id,
         "Data de envio": new Date(r.created_at).toLocaleString("pt-BR"),
         Tipo: r.tipo,
+        Setor: setorLabel(r.setor),
         "Dias de presença": (r.dias || []).join(", "),
         "Responsável - Nome": r.responsavel_nome,
         "Responsável - WhatsApp": r.responsavel_whatsapp,
@@ -318,8 +322,13 @@ function Admin() {
 
                 <div className="flex justify-between items-start gap-4 flex-wrap">
                   <div>
-                    <p className="font-semibold">
+                    <p className="font-semibold flex items-center gap-2 flex-wrap">
                       {r.nome_banda || r.responsavel_nome}
+                      {!isBanda(r) && r.setor && (
+                        <span className="text-xs font-medium uppercase tracking-wide rounded-full border border-border bg-muted px-2 py-0.5 text-muted-foreground">
+                          {setorLabel(r.setor)}
+                        </span>
+                      )}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {r.tipo} · {(r.dias || []).join(", ")}

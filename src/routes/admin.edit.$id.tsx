@@ -19,6 +19,7 @@ export const Route = createFileRoute("/admin/edit/$id")({
 type Row = {
   id: string;
   tipo: string;
+  setor: string | null;
   dias: string[];
   responsavel_nome: string;
   responsavel_whatsapp: string;
@@ -37,6 +38,7 @@ function rowToFormValues(r: Row): FormValues {
   return {
     ...emptyFormValues,
     tipo: isBanda ? "banda" : "equipe",
+    setor: isBanda ? "" : r.setor || "",
     dias: r.dias || [],
     responsavel_nome: isBanda ? r.responsavel_nome || "" : "",
     responsavel_whatsapp: isBanda ? maskPhone(r.responsavel_whatsapp || "") : "",

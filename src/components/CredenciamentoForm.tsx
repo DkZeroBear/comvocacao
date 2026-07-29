@@ -12,6 +12,7 @@ export type Tipo = "equipe" | "banda";
 
 export type FormValues = {
   tipo: Tipo | "";
+  setor: string;
   dias: string[];
   responsavel_nome: string;
   responsavel_whatsapp: string;
@@ -24,6 +25,18 @@ export type FormValues = {
   veiculos: { marca_modelo: string; cor: string; placa: string }[];
   membros: { nome: string; funcao: string }[];
 };
+
+export const SETORES = [
+  { value: "palco", label: "Equipe Palco" },
+  { value: "camarim", label: "Equipe Camarim" },
+  { value: "press", label: "Equipe Press" },
+  { value: "tecnica", label: "Equipe Técnica" },
+  { value: "prefeitura", label: "Prefeitura / Convidados" },
+] as const;
+
+export function setorLabel(value?: string | null) {
+  return SETORES.find((s) => s.value === value)?.label ?? "";
+}
 
 export const FUNCOES_EQUIPE = ["Comissão", "Apresentador(a)"];
 export const FUNCOES_BANDA = [
@@ -38,6 +51,7 @@ export const DIAS = ["Dia 15", "Dia 16", "Ambos os dias"];
 
 export const emptyFormValues: FormValues = {
   tipo: "",
+  setor: "",
   dias: [],
   responsavel_nome: "",
   responsavel_whatsapp: "",
@@ -50,6 +64,7 @@ export const emptyFormValues: FormValues = {
   veiculos: [],
   membros: [{ nome: "", funcao: "" }],
 };
+
 
 export function maskPhone(v: string) {
   const d = v.replace(/\D/g, "").slice(0, 11);
@@ -65,7 +80,8 @@ export function buildPayload(values: FormValues) {
   const isBanda = values.tipo === "banda";
   const membrosFiltrados = values.membros.filter((m) => m.nome.trim());
   return {
-    tipo: isBanda ? "Banda / Artista" : "Equipe Palco/Camarim",
+    tipo: isBanda ? "Banda / Artista" : "Equipe",
+    setor: isBanda ? null : values.setor || null,
     dias: values.dias,
     responsavel_nome: isBanda ? values.responsavel_nome.trim() : membrosFiltrados[0].nome,
     responsavel_whatsapp: isBanda ? values.responsavel_whatsapp.trim() : "—",
@@ -150,6 +166,8 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       if (!values.horario_chegada) return toast.error("Informe o horário previsto de chegada.");
       if (!values.quantidade_pessoas || Number(values.quantidade_pessoas) < 1)
         return toast.error("Informe a quantidade estimada de pessoas.");
+    } else if (!values.setor) {
+      return toast.error("Selecione o setor da equipe.");
     }
 
     if (!values.membros.filter((m) => m.nome.trim()).length)
@@ -320,6 +338,31 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
           )}
         />
       </section>
+
+      {/* Setor (apenas Equipe) */}
+      {tipo === "equipe" && (
+        <section className="space-y-4">
+          <SectionTitle>Setor</SectionTitle>
+          <div>
+            <Label className="text-sm">
+              Setor da equipe <span className="text-destructive">*</span>
+            </Label>
+            <select
+              className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+              {...form.register("setor")}
+            >
+              <option value="">Selecione...</option>
+              {SETORES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+      )}
+
+
 
       {/* Dias */}
       <section className="space-y-4">
