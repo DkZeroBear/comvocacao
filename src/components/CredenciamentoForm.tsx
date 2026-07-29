@@ -339,6 +339,31 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
         />
       </section>
 
+      {/* Setor (apenas Equipe) */}
+      {tipo === "equipe" && (
+        <section className="space-y-4">
+          <SectionTitle>Setor</SectionTitle>
+          <div>
+            <Label className="text-sm">
+              Setor da equipe <span className="text-destructive">*</span>
+            </Label>
+            <select
+              className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+              {...form.register("setor")}
+            >
+              <option value="">Selecione...</option>
+              {SETORES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+      )}
+
+
+
       {/* Dias */}
       <section className="space-y-4">
         <SectionTitle>Dias de presença</SectionTitle>
