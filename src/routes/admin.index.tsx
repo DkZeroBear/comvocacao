@@ -17,6 +17,7 @@ type Row = {
   id: string;
   created_at: string;
   tipo: string;
+  setor: string | null;
   dias: string[];
   responsavel_nome: string;
   responsavel_whatsapp: string;

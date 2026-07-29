@@ -38,6 +38,7 @@ function rowToFormValues(r: Row): FormValues {
   return {
     ...emptyFormValues,
     tipo: isBanda ? "banda" : "equipe",
+    setor: isBanda ? "" : r.setor || "",
     dias: r.dias || [],
     responsavel_nome: isBanda ? r.responsavel_nome || "" : "",
     responsavel_whatsapp: isBanda ? maskPhone(r.responsavel_whatsapp || "") : "",
