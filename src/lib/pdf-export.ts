@@ -154,7 +154,7 @@ function renderOrganizationView(
   const bandas = dayRows.filter((r) => r.tipo === "Banda / Artista");
 
   const drawHead = () =>
-    drawHeader(doc, logo, "Convocação", day);
+    drawHeader(doc, logo, "ComVocação", day);
 
   drawHead();
   let y = 40;
@@ -341,7 +341,7 @@ function renderSecurityView(
   rows: Credenciamento[]
 ) {
   const drawHead = () =>
-    drawHeader(doc, logo, "Comvocação — Controle de Acesso", day);
+    drawHeader(doc, logo, "ComVocação — Controle de Acesso", day);
 
   doc.addPage();
   drawHead();

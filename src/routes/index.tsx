@@ -70,12 +70,12 @@ function Index() {
 
             <img
               src={logoComvocacao.url}
-              alt="Comvocação"
+              alt="ComVocação"
               className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-border"
             />
             <div className="min-w-0">
               <h1 className="text-2xl tracking-tight text-foreground font-extrabold sm:text-4xl">
-                Comvocação
+                ComVocação
               </h1>
               <p className="text-sm sm:text-base mt-0.5 text-secondary font-medium">
                 Festa em prol das vocações sacerdotais

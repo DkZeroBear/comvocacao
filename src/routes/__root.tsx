@@ -29,13 +29,13 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Comvocação — Credenciamento" },
+      { title: "ComVocação — Credenciamento" },
       {
         name: "description",
         content:
           "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam.",
       },
-      { property: "og:title", content: "Comvocação — Credenciamento" },
+      { property: "og:title", content: "ComVocação — Credenciamento" },
       {
         property: "og:description",
         content:
@@ -44,7 +44,7 @@ export const Route = createRootRoute({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Comvocação — Credenciamento" },
+      { name: "twitter:title", content: "ComVocação — Credenciamento" },
       { name: "description", content: "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam." },
       { property: "og:description", content: "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam." },
       { name: "twitter:description", content: "Formulário de credenciamento para a Festa da Família. Festa e Música que transformam." },
