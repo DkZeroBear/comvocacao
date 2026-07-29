@@ -280,7 +280,7 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
     </section>
   );
 
-  const membrosSection = (titulo: string, opcoes: string[]) => (
+  const membrosSection = (titulo: string, opcoes: string[] | null, rotulo = "Função") => (
     <section className="space-y-4">
       <SectionTitle>{titulo}</SectionTitle>
       <div className="space-y-3">
@@ -301,24 +301,27 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
                 <Label className="text-sm">Nome completo</Label>
                 <Input placeholder="Nome completo" {...form.register(`membros.${i}.nome`)} />
               </div>
-              <div>
-                <Label className="text-sm">Função</Label>
-                <select
-                  className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
-                  {...form.register(`membros.${i}.funcao`)}
-                >
-                  <option value="">Selecione...</option>
-                  {opcoes.map((fn) => (
-                    <option key={fn} value={fn}>
-                      {fn}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {opcoes && (
+                <div>
+                  <Label className="text-sm">{rotulo}</Label>
+                  <select
+                    className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                    {...form.register(`membros.${i}.funcao`)}
+                  >
+                    <option value="">Selecione...</option>
+                    {opcoes.map((fn) => (
+                      <option key={fn} value={fn}>
+                        {fn}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
+
       <Button
         type="button"
         variant="outline"
