@@ -254,7 +254,8 @@ function Admin() {
               {filtered.length !== rows.length
                 ? `${filtered.length} de ${rows.length} credenciamentos`
                 : `${rows.length} ${rows.length === 1 ? "credenciamento" : "credenciamentos"}`}{" "}
-              · {totalEquipe} Equipe · {totalBanda} Banda · Dia 15: {countDia("15")} · Dia 16:{" "}
+              · {totalEquipe} Equipe · {totalBanda} Banda · {totalPrefeitura} Prefeitura/Convidados ·{" "}
+              {totalComissao} Comissão · Dia 15: {countDia("15")} · Dia 16:{" "}
               {countDia("16")} · Qtd. veículos: {totalVeiculos}
             </p>
 
