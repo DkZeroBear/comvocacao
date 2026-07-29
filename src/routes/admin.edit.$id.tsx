@@ -33,12 +33,21 @@ type Row = {
   veiculos: { marca_modelo: string; cor: string; placa: string }[];
 };
 
+function tipoFromRow(tipo: string): FormValues["tipo"] {
+  const t = (tipo || "").toLowerCase();
+  if (t.includes("banda") || t.includes("artista")) return "banda";
+  if (t.includes("prefeitura") || t.includes("convidado")) return "prefeitura";
+  if (t.includes("comiss")) return "comissao";
+  return "equipe";
+}
+
 function rowToFormValues(r: Row): FormValues {
-  const isBanda = (r.tipo || "").toLowerCase().includes("banda");
+  const tipo = tipoFromRow(r.tipo);
+  const isBanda = tipo === "banda";
   return {
     ...emptyFormValues,
-    tipo: isBanda ? "banda" : "equipe",
-    setor: isBanda ? "" : r.setor || "",
+    tipo,
+    setor: tipo === "equipe" ? r.setor || "" : "",
     dias: r.dias || [],
     responsavel_nome: isBanda ? r.responsavel_nome || "" : "",
     responsavel_whatsapp: isBanda ? maskPhone(r.responsavel_whatsapp || "") : "",
@@ -52,6 +61,7 @@ function rowToFormValues(r: Row): FormValues {
     membros: r.membros?.length ? r.membros : [{ nome: "", funcao: "" }],
   };
 }
+
 
 function AdminEdit() {
   const { id } = Route.useParams();

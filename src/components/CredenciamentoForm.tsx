@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Plus, Trash2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type Tipo = "equipe" | "banda";
+export type Tipo = "equipe" | "banda" | "prefeitura" | "comissao";
 
 export type FormValues = {
   tipo: Tipo | "";
@@ -26,19 +26,36 @@ export type FormValues = {
   membros: { nome: string; funcao: string }[];
 };
 
+export const TIPOS = [
+  { value: "equipe", title: "Equipe", sub: "Setor e equipes de apoio ao evento" },
+  { value: "banda", title: "Banda / Artista", sub: "Músicos e equipe artística" },
+  {
+    value: "prefeitura",
+    title: "Prefeitura / Convidados",
+    sub: "Autoridades e convidados oficiais",
+  },
+  {
+    value: "comissao",
+    title: "Comissão Organizadora",
+    sub: "Membros da comissão do evento",
+  },
+] as const;
+
+export function tipoLabel(value?: string | null) {
+  return TIPOS.find((t) => t.value === value)?.title ?? "";
+}
+
 export const SETORES = [
   { value: "palco", label: "Equipe Palco" },
   { value: "camarim", label: "Equipe Camarim" },
   { value: "press", label: "Equipe Press" },
   { value: "tecnica", label: "Equipe Técnica" },
-  { value: "prefeitura", label: "Prefeitura / Convidados" },
 ] as const;
 
 export function setorLabel(value?: string | null) {
   return SETORES.find((s) => s.value === value)?.label ?? "";
 }
 
-export const FUNCOES_EQUIPE = ["Comissão", "Apresentador(a)"];
 export const FUNCOES_BANDA = [
   "Cantor(a)",
   "Músico(a)",
@@ -47,7 +64,32 @@ export const FUNCOES_BANDA = [
   "Fotógrafo/Videomaker",
   "Acompanhante",
 ];
+
+export const FUNCOES_POR_SETOR: Record<string, string[]> = {
+  palco: ["Apoio (Staff)", "Apresentador(a)"],
+  camarim: ["Apoio (Staff)"],
+  tecnica: ["Som", "Iluminação", "Transmissão/Streaming", "Apoio técnico"],
+  press: ["Fotógrafo(a)", "Videomaker", "Apoio (Staff)"],
+};
+
+export const FUNCOES_PREFEITURA = [
+  "Prefeito",
+  "Vice",
+  "Vereador(a)",
+  "Assessoria",
+  "Convidado(a)",
+];
+
+/** Opções e rótulo do campo de função/cargo conforme tipo e setor. */
+export function funcaoConfig(tipo: string, setor: string): { label: string; opcoes: string[] | null } {
+  if (tipo === "banda") return { label: "Função", opcoes: FUNCOES_BANDA };
+  if (tipo === "equipe") return { label: "Função", opcoes: FUNCOES_POR_SETOR[setor] ?? [] };
+  if (tipo === "prefeitura") return { label: "Cargo", opcoes: FUNCOES_PREFEITURA };
+  return { label: "Função", opcoes: null };
+}
+
 export const DIAS = ["Dia 15", "Dia 16", "Ambos os dias"];
+
 
 export const emptyFormValues: FormValues = {
   tipo: "",
@@ -80,21 +122,24 @@ export function buildPayload(values: FormValues) {
   const isBanda = values.tipo === "banda";
   const membrosFiltrados = values.membros.filter((m) => m.nome.trim());
   return {
-    tipo: isBanda ? "Banda / Artista" : "Equipe",
-    setor: isBanda ? null : values.setor || null,
+    tipo: tipoLabel(values.tipo),
+    setor: values.tipo === "equipe" ? values.setor || null : null,
     dias: values.dias,
-    responsavel_nome: isBanda ? values.responsavel_nome.trim() : membrosFiltrados[0].nome,
+    responsavel_nome: isBanda
+      ? values.responsavel_nome.trim()
+      : membrosFiltrados[0]?.nome ?? "",
     responsavel_whatsapp: isBanda ? values.responsavel_whatsapp.trim() : "—",
     eh_produtor: isBanda ? values.eh_produtor === "sim" : null,
     pode_contatar: isBanda ? values.pode_contatar === "sim" : null,
     quantidade_pessoas: isBanda ? Number(values.quantidade_pessoas) : membrosFiltrados.length,
-    observacoes: isBanda ? values.observacoes.trim() || null : null,
+    observacoes: values.observacoes.trim() || null,
     nome_banda: isBanda ? values.nome_banda.trim() : null,
     horario_chegada: isBanda ? values.horario_chegada : null,
     membros: membrosFiltrados,
     veiculos: values.veiculos.filter((v) => v.placa.trim() || v.marca_modelo.trim()),
   };
 }
+
 
 export function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -148,7 +193,9 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
   const membros = useFieldArray({ control: form.control, name: "membros" });
   const veiculos = useFieldArray({ control: form.control, name: "veiculos" });
 
-  const funcoes = tipo === "equipe" ? FUNCOES_EQUIPE : FUNCOES_BANDA;
+  const setor = form.watch("setor");
+  const { label: funcaoLabel, opcoes: funcoes } = funcaoConfig(tipo, setor);
+
 
   const handleSubmit = async (values: FormValues) => {
     if (!values.tipo) return toast.error("Selecione o tipo de credenciamento.");
@@ -166,9 +213,10 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       if (!values.horario_chegada) return toast.error("Informe o horário previsto de chegada.");
       if (!values.quantidade_pessoas || Number(values.quantidade_pessoas) < 1)
         return toast.error("Informe a quantidade estimada de pessoas.");
-    } else if (!values.setor) {
+    } else if (values.tipo === "equipe" && !values.setor) {
       return toast.error("Selecione o setor da equipe.");
     }
+
 
     if (!values.membros.filter((m) => m.nome.trim()).length)
       return toast.error("Adicione ao menos um membro.");
@@ -232,7 +280,7 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
     </section>
   );
 
-  const membrosSection = (titulo: string, opcoes: string[]) => (
+  const membrosSection = (titulo: string, opcoes: string[] | null, rotulo = "Função") => (
     <section className="space-y-4">
       <SectionTitle>{titulo}</SectionTitle>
       <div className="space-y-3">
@@ -253,24 +301,27 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
                 <Label className="text-sm">Nome completo</Label>
                 <Input placeholder="Nome completo" {...form.register(`membros.${i}.nome`)} />
               </div>
-              <div>
-                <Label className="text-sm">Função</Label>
-                <select
-                  className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
-                  {...form.register(`membros.${i}.funcao`)}
-                >
-                  <option value="">Selecione...</option>
-                  {opcoes.map((fn) => (
-                    <option key={fn} value={fn}>
-                      {fn}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {opcoes && (
+                <div>
+                  <Label className="text-sm">{rotulo}</Label>
+                  <select
+                    className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                    {...form.register(`membros.${i}.funcao`)}
+                  >
+                    <option value="">Selecione...</option>
+                    {opcoes.map((fn) => (
+                      <option key={fn} value={fn}>
+                        {fn}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
+
       <Button
         type="button"
         variant="outline"
@@ -312,10 +363,8 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
           name="tipo"
           render={({ field }) => (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                { value: "equipe", title: "Equipe", sub: "Setor e equipes de apoio ao evento" },
-                { value: "banda", title: "Banda / Artista", sub: "Músicos e equipe artística" },
-              ].map((opt) => {
+              {TIPOS.map((opt) => {
+
                 const active = field.value === opt.value;
                 return (
                   <button
@@ -347,17 +396,31 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
             <Label className="text-sm">
               Setor da equipe <span className="text-destructive">*</span>
             </Label>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
-              {...form.register("setor")}
-            >
-              <option value="">Selecione...</option>
-              {SETORES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={form.control}
+              name="setor"
+              render={({ field }) => (
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                  value={field.value}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    // a lista de funções muda por setor: limpa seleções anteriores
+                    form.getValues("membros").forEach((_, i) => {
+                      form.setValue(`membros.${i}.funcao`, "");
+                    });
+                  }}
+                >
+                  <option value="">Selecione...</option>
+                  {SETORES.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+
           </div>
         </section>
       )}
@@ -392,9 +455,33 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
         />
       </section>
 
-      {/* Equipe */}
-      {tipo === "equipe" && membrosSection("Membros da equipe", FUNCOES_EQUIPE)}
-      {tipo === "equipe" && veiculosSection}
+      {/* Equipe / Prefeitura / Comissão — bloco compartilhado */}
+      {(tipo === "equipe" || tipo === "prefeitura" || tipo === "comissao") && (
+        <>
+          {membrosSection(
+            tipo === "equipe"
+              ? "Membros da equipe"
+              : tipo === "prefeitura"
+                ? "Convidados"
+                : "Membros da comissão",
+            funcoes,
+            funcaoLabel
+          )}
+          {veiculosSection}
+          <section className="space-y-4">
+            <SectionTitle>Informações gerais</SectionTitle>
+            <div>
+              <Label className="text-sm">Observações</Label>
+              <Textarea
+                rows={4}
+                placeholder="Possui alguma restrição alimentar ou informação que seja útil à organização ser informada previamente?"
+                {...form.register("observacoes")}
+              />
+            </div>
+          </section>
+        </>
+      )}
+
 
       {/* Banda */}
       {tipo === "banda" && (
