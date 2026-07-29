@@ -80,7 +80,8 @@ export function buildPayload(values: FormValues) {
   const isBanda = values.tipo === "banda";
   const membrosFiltrados = values.membros.filter((m) => m.nome.trim());
   return {
-    tipo: isBanda ? "Banda / Artista" : "Equipe Palco/Camarim",
+    tipo: isBanda ? "Banda / Artista" : "Equipe",
+    setor: isBanda ? null : values.setor || null,
     dias: values.dias,
     responsavel_nome: isBanda ? values.responsavel_nome.trim() : membrosFiltrados[0].nome,
     responsavel_whatsapp: isBanda ? values.responsavel_whatsapp.trim() : "—",
