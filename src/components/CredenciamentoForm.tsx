@@ -588,6 +588,7 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       {/* Equipe / Prefeitura / Comissão — bloco compartilhado */}
       {(tipo === "equipe" || tipo === "prefeitura" || tipo === "comissao") && (
         <>
+          {tipo === "prefeitura" && responsavelSection}
           {membrosSection(
             tipo === "equipe"
               ? "Membros da equipe"
