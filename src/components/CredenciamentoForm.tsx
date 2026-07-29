@@ -122,21 +122,24 @@ export function buildPayload(values: FormValues) {
   const isBanda = values.tipo === "banda";
   const membrosFiltrados = values.membros.filter((m) => m.nome.trim());
   return {
-    tipo: isBanda ? "Banda / Artista" : "Equipe",
-    setor: isBanda ? null : values.setor || null,
+    tipo: tipoLabel(values.tipo),
+    setor: values.tipo === "equipe" ? values.setor || null : null,
     dias: values.dias,
-    responsavel_nome: isBanda ? values.responsavel_nome.trim() : membrosFiltrados[0].nome,
+    responsavel_nome: isBanda
+      ? values.responsavel_nome.trim()
+      : membrosFiltrados[0]?.nome ?? "",
     responsavel_whatsapp: isBanda ? values.responsavel_whatsapp.trim() : "—",
     eh_produtor: isBanda ? values.eh_produtor === "sim" : null,
     pode_contatar: isBanda ? values.pode_contatar === "sim" : null,
     quantidade_pessoas: isBanda ? Number(values.quantidade_pessoas) : membrosFiltrados.length,
-    observacoes: isBanda ? values.observacoes.trim() || null : null,
+    observacoes: values.observacoes.trim() || null,
     nome_banda: isBanda ? values.nome_banda.trim() : null,
     horario_chegada: isBanda ? values.horario_chegada : null,
     membros: membrosFiltrados,
     veiculos: values.veiculos.filter((v) => v.placa.trim() || v.marca_modelo.trim()),
   };
 }
+
 
 export function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
