@@ -313,7 +313,7 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
           render={({ field }) => (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
-                { value: "equipe", title: "Equipe", sub: "Palco / Camarim" },
+                { value: "equipe", title: "Equipe", sub: "Setor e equipes de apoio ao evento" },,
                 { value: "banda", title: "Banda / Artista", sub: "Músicos e equipe artística" },
               ].map((opt) => {
                 const active = field.value === opt.value;
