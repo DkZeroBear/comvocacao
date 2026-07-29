@@ -443,9 +443,33 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
         />
       </section>
 
-      {/* Equipe */}
-      {tipo === "equipe" && membrosSection("Membros da equipe", FUNCOES_EQUIPE)}
-      {tipo === "equipe" && veiculosSection}
+      {/* Equipe / Prefeitura / Comissão — bloco compartilhado */}
+      {(tipo === "equipe" || tipo === "prefeitura" || tipo === "comissao") && (
+        <>
+          {membrosSection(
+            tipo === "equipe"
+              ? "Membros da equipe"
+              : tipo === "prefeitura"
+                ? "Convidados"
+                : "Membros da comissão",
+            funcoes,
+            funcaoLabel
+          )}
+          {veiculosSection}
+          <section className="space-y-4">
+            <SectionTitle>Informações gerais</SectionTitle>
+            <div>
+              <Label className="text-sm">Observações</Label>
+              <Textarea
+                rows={4}
+                placeholder="Possui alguma restrição alimentar ou informação que seja útil à organização ser informada previamente?"
+                {...form.register("observacoes")}
+              />
+            </div>
+          </section>
+        </>
+      )}
+
 
       {/* Banda */}
       {tipo === "banda" && (
