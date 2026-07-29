@@ -44,13 +44,14 @@ function tipoFromRow(tipo: string): FormValues["tipo"] {
 function rowToFormValues(r: Row): FormValues {
   const tipo = tipoFromRow(r.tipo);
   const isBanda = tipo === "banda";
+  const comResponsavel = temResponsavel(tipo);
   return {
     ...emptyFormValues,
     tipo,
     setor: tipo === "equipe" ? r.setor || "" : "",
     dias: r.dias || [],
-    responsavel_nome: isBanda ? r.responsavel_nome || "" : "",
-    responsavel_whatsapp: isBanda ? maskPhone(r.responsavel_whatsapp || "") : "",
+    responsavel_nome: comResponsavel ? r.responsavel_nome || "" : "",
+    responsavel_whatsapp: comResponsavel ? maskPhone(r.responsavel_whatsapp || "") : "",
     eh_produtor: r.eh_produtor === null ? "" : r.eh_produtor ? "sim" : "nao",
     pode_contatar: r.pode_contatar === null ? "" : r.pode_contatar ? "sim" : "nao",
     quantidade_pessoas: isBanda ? r.quantidade_pessoas ?? "" : "",
@@ -58,7 +59,7 @@ function rowToFormValues(r: Row): FormValues {
     nome_banda: r.nome_banda || "",
     horario_chegada: r.horario_chegada || "",
     veiculos: r.veiculos || [],
-    membros: r.membros?.length ? r.membros : [{ nome: "", funcao: "" }],
+    membros: r.membros?.length ? r.membros : [{ nome: "", funcao: "", whatsapp: "" }],
   };
 }
 
