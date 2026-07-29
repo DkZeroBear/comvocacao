@@ -104,18 +104,25 @@ function Admin() {
     toast.success("Cadastro excluído");
   };
 
-  const isBanda = (r: Row) => (r.tipo || "").toLowerCase().includes("banda");
+  const tipoKey = (r: Row): "equipe" | "banda" | "prefeitura" | "comissao" | "outro" => {
+    if (r.tipo === "Banda / Artista") return "banda";
+    if (r.tipo === "Equipe") return "equipe";
+    if (r.tipo === "Prefeitura / Convidados") return "prefeitura";
+    if (r.tipo === "Comissão Organizadora") return "comissao";
+    return "outro";
+  };
   const inDia = (r: Row, dia: string) =>
     (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"));
 
-  const totalEquipe = rows.filter((r) => !isBanda(r)).length;
-  const totalBanda = rows.filter((r) => isBanda(r)).length;
+  const totalEquipe = rows.filter((r) => tipoKey(r) === "equipe").length;
+  const totalBanda = rows.filter((r) => tipoKey(r) === "banda").length;
+  const totalPrefeitura = rows.filter((r) => tipoKey(r) === "prefeitura").length;
+  const totalComissao = rows.filter((r) => tipoKey(r) === "comissao").length;
   const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
   const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
 
   const filtered = rows.filter((r) => {
-    if (filtroTipo === "equipe" && isBanda(r)) return false;
-    if (filtroTipo === "banda" && !isBanda(r)) return false;
+    if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
     if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
     const q = busca.trim().toLowerCase();
     if (!q) return true;
