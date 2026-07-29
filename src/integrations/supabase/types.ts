@@ -28,6 +28,7 @@ export type Database = {
           quantidade_pessoas: number
           responsavel_nome: string
           responsavel_whatsapp: string
+          setor: string | null
           tipo: string
           veiculos: Json
         }
@@ -44,6 +45,7 @@ export type Database = {
           quantidade_pessoas: number
           responsavel_nome: string
           responsavel_whatsapp: string
+          setor?: string | null
           tipo: string
           veiculos?: Json
         }
@@ -60,6 +62,7 @@ export type Database = {
           quantidade_pessoas?: number
           responsavel_nome?: string
           responsavel_whatsapp?: string
+          setor?: string | null
           tipo?: string
           veiculos?: Json
         }
