@@ -617,76 +617,9 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       {/* Banda */}
       {tipo === "banda" && (
         <>
-          <section className="space-y-4">
-            <SectionTitle>Responsável pelo cadastro</SectionTitle>
-            <div className="rounded-md border border-foreground/30 bg-foreground/5 px-4 py-3 text-sm">
-              Quem está preenchendo este formulário em nome da banda ou artista.
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm">
-                  Nome completo <span className="text-destructive">*</span>
-                </Label>
-                <Input placeholder="Seu nome" {...form.register("responsavel_nome")} />
-              </div>
-              <div>
-                <Label className="text-sm">
-                  WhatsApp <span className="text-destructive">*</span>
-                </Label>
-                <Controller
-                  control={form.control}
-                  name="responsavel_whatsapp"
-                  render={({ field }) => (
-                    <Input
-                      inputMode="tel"
-                      placeholder="(00) 00000-0000"
-                      value={field.value}
-                      onChange={(e) => field.onChange(maskPhone(e.target.value))}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-sm">
-                É produtor(a)? <span className="text-destructive">*</span>
-              </Label>
-              <Controller
-                control={form.control}
-                name="eh_produtor"
-                render={({ field }) => (
-                  <div className="flex gap-2 mt-1.5">
-                    <Pill active={field.value === "sim"} onClick={() => field.onChange("sim")}>
-                      Sim
-                    </Pill>
-                    <Pill active={field.value === "nao"} onClick={() => field.onChange("nao")}>
-                      Não
-                    </Pill>
-                  </div>
-                )}
-              />
-            </div>
-            <div>
-              <Label className="text-sm">
-                Podemos entrar em contato com este número caso necessário?{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <Controller
-                control={form.control}
-                name="pode_contatar"
-                render={({ field }) => (
-                  <div className="flex gap-2 mt-1.5">
-                    <Pill active={field.value === "sim"} onClick={() => field.onChange("sim")}>
-                      Sim
-                    </Pill>
-                    <Pill active={field.value === "nao"} onClick={() => field.onChange("nao")}>
-                      Não
-                    </Pill>
-                  </div>
-                )}
-              />
-            </div>
-          </section>
+          {responsavelSection}
+
+
 
           <section className="space-y-4">
             <SectionTitle>Banda / Artista</SectionTitle>
