@@ -157,7 +157,7 @@ function Admin() {
         "Banda/Responsável": r.nome_banda || r.responsavel_nome,
         "Membro #": i + 1,
         Nome: m.nome,
-        Função: m.funcao,
+        "Função / Cargo": m.funcao,
       }))
     );
 
