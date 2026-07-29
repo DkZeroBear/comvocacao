@@ -193,7 +193,9 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
   const membros = useFieldArray({ control: form.control, name: "membros" });
   const veiculos = useFieldArray({ control: form.control, name: "veiculos" });
 
-  const funcoes = tipo === "equipe" ? FUNCOES_EQUIPE : FUNCOES_BANDA;
+  const setor = form.watch("setor");
+  const { label: funcaoLabel, opcoes: funcoes } = funcaoConfig(tipo, setor);
+
 
   const handleSubmit = async (values: FormValues) => {
     if (!values.tipo) return toast.error("Selecione o tipo de credenciamento.");
