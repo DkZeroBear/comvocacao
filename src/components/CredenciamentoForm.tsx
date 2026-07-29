@@ -12,6 +12,7 @@ export type Tipo = "equipe" | "banda";
 
 export type FormValues = {
   tipo: Tipo | "";
+  setor: string;
   dias: string[];
   responsavel_nome: string;
   responsavel_whatsapp: string;
@@ -24,6 +25,18 @@ export type FormValues = {
   veiculos: { marca_modelo: string; cor: string; placa: string }[];
   membros: { nome: string; funcao: string }[];
 };
+
+export const SETORES = [
+  { value: "palco", label: "Equipe Palco" },
+  { value: "camarim", label: "Equipe Camarim" },
+  { value: "press", label: "Equipe Press" },
+  { value: "tecnica", label: "Equipe Técnica" },
+  { value: "prefeitura", label: "Prefeitura / Convidados" },
+] as const;
+
+export function setorLabel(value?: string | null) {
+  return SETORES.find((s) => s.value === value)?.label ?? "";
+}
 
 export const FUNCOES_EQUIPE = ["Comissão", "Apresentador(a)"];
 export const FUNCOES_BANDA = [
@@ -38,6 +51,7 @@ export const DIAS = ["Dia 15", "Dia 16", "Ambos os dias"];
 
 export const emptyFormValues: FormValues = {
   tipo: "",
+  setor: "",
   dias: [],
   responsavel_nome: "",
   responsavel_whatsapp: "",
@@ -50,6 +64,7 @@ export const emptyFormValues: FormValues = {
   veiculos: [],
   membros: [{ nome: "", funcao: "" }],
 };
+
 
 export function maskPhone(v: string) {
   const d = v.replace(/\D/g, "").slice(0, 11);
