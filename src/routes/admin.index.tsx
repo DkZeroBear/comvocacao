@@ -104,18 +104,25 @@ function Admin() {
     toast.success("Cadastro excluído");
   };
 
-  const isBanda = (r: Row) => (r.tipo || "").toLowerCase().includes("banda");
+  const tipoKey = (r: Row): "equipe" | "banda" | "prefeitura" | "comissao" | "outro" => {
+    if (r.tipo === "Banda / Artista") return "banda";
+    if (r.tipo === "Equipe") return "equipe";
+    if (r.tipo === "Prefeitura / Convidados") return "prefeitura";
+    if (r.tipo === "Comissão Organizadora") return "comissao";
+    return "outro";
+  };
   const inDia = (r: Row, dia: string) =>
     (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"));
 
-  const totalEquipe = rows.filter((r) => !isBanda(r)).length;
-  const totalBanda = rows.filter((r) => isBanda(r)).length;
+  const totalEquipe = rows.filter((r) => tipoKey(r) === "equipe").length;
+  const totalBanda = rows.filter((r) => tipoKey(r) === "banda").length;
+  const totalPrefeitura = rows.filter((r) => tipoKey(r) === "prefeitura").length;
+  const totalComissao = rows.filter((r) => tipoKey(r) === "comissao").length;
   const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
   const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
 
   const filtered = rows.filter((r) => {
-    if (filtroTipo === "equipe" && isBanda(r)) return false;
-    if (filtroTipo === "banda" && !isBanda(r)) return false;
+    if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
     if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
     const q = busca.trim().toLowerCase();
     if (!q) return true;
@@ -247,7 +254,8 @@ function Admin() {
               {filtered.length !== rows.length
                 ? `${filtered.length} de ${rows.length} credenciamentos`
                 : `${rows.length} ${rows.length === 1 ? "credenciamento" : "credenciamentos"}`}{" "}
-              · {totalEquipe} Equipe · {totalBanda} Banda · Dia 15: {countDia("15")} · Dia 16:{" "}
+              · {totalEquipe} Equipe · {totalBanda} Banda · {totalPrefeitura} Prefeitura/Convidados ·{" "}
+              {totalComissao} Comissão · Dia 15: {countDia("15")} · Dia 16:{" "}
               {countDia("16")} · Qtd. veículos: {totalVeiculos}
             </p>
 
@@ -291,7 +299,9 @@ function Admin() {
           >
             <option value="todos">Todos os tipos</option>
             <option value="equipe">Equipe</option>
-            <option value="banda">Banda</option>
+            <option value="banda">Banda / Artista</option>
+            <option value="prefeitura">Prefeitura / Convidados</option>
+            <option value="comissao">Comissão Organizadora</option>
           </select>
           <select
             value={filtroDia}
@@ -324,7 +334,7 @@ function Admin() {
                   <div>
                     <p className="font-semibold flex items-center gap-2 flex-wrap">
                       {r.nome_banda || r.responsavel_nome}
-                      {!isBanda(r) && r.setor && (
+                      {tipoKey(r) === "equipe" && r.setor && (
                         <span className="text-xs font-medium uppercase tracking-wide rounded-full border border-border bg-muted px-2 py-0.5 text-muted-foreground">
                           {setorLabel(r.setor)}
                         </span>
