@@ -117,20 +117,38 @@ export function maskPhone(v: string) {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
+/** Tipos que informam um responsável pelo cadastro. */
+export function temResponsavel(tipo: string) {
+  return tipo === "banda" || tipo === "prefeitura";
+}
+
+/** Tipos em que cada membro informa um contato próprio. */
+export function membroTemWhatsapp(tipo: string) {
+  return tipo === "equipe" || tipo === "comissao";
+}
+
 /** Monta o payload de banco a partir dos valores do formulário. */
 export function buildPayload(values: FormValues) {
   const isBanda = values.tipo === "banda";
-  const membrosFiltrados = values.membros.filter((m) => m.nome.trim());
+  const comResponsavel = temResponsavel(values.tipo);
+  const comWhatsapp = membroTemWhatsapp(values.tipo);
+  const membrosFiltrados = values.membros
+    .filter((m) => m.nome.trim())
+    .map((m) => ({
+      nome: m.nome.trim(),
+      funcao: m.funcao,
+      ...(comWhatsapp ? { whatsapp: (m.whatsapp ?? "").trim() } : {}),
+    }));
   return {
     tipo: tipoLabel(values.tipo),
     setor: values.tipo === "equipe" ? values.setor || null : null,
     dias: values.dias,
-    responsavel_nome: isBanda
+    responsavel_nome: comResponsavel
       ? values.responsavel_nome.trim()
       : membrosFiltrados[0]?.nome ?? "",
-    responsavel_whatsapp: isBanda ? values.responsavel_whatsapp.trim() : "—",
-    eh_produtor: isBanda ? values.eh_produtor === "sim" : null,
-    pode_contatar: isBanda ? values.pode_contatar === "sim" : null,
+    responsavel_whatsapp: comResponsavel ? values.responsavel_whatsapp.trim() : "—",
+    eh_produtor: comResponsavel ? values.eh_produtor === "sim" : null,
+    pode_contatar: comResponsavel ? values.pode_contatar === "sim" : null,
     quantidade_pessoas: isBanda ? Number(values.quantidade_pessoas) : membrosFiltrados.length,
     observacoes: values.observacoes.trim() || null,
     nome_banda: isBanda ? values.nome_banda.trim() : null,
