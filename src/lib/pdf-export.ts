@@ -166,7 +166,7 @@ function renderOrganizationView(
     { value: "camarim", label: "Equipe Camarim" },
     { value: "tecnica", label: "Equipe Técnica" },
     { value: "press", label: "Equipe Press" },
-    { value: "prefeitura", label: "Prefeitura / Convidados" },
+    
   ];
 
   const getFinalY = () =>
