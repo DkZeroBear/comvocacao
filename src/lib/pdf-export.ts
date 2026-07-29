@@ -442,7 +442,14 @@ function renderSecurityView(
     const grupo =
       r.tipo === "Banda / Artista"
         ? r.nome_banda || "Banda / Artista"
-        : "Equipe Palco/Camarim";
+        : r.tipo === "Equipe"
+          ? SETORES_PDF.find((s) => s.value === r.setor)?.label || "Equipe"
+          : r.tipo === "Prefeitura / Convidados"
+            ? "Prefeitura / Convidados"
+            : r.tipo === "Comissão Organizadora"
+              ? "Comissão Organizadora"
+              : r.tipo || "—";
+
     for (const m of r.membros || []) {
       people.push({
         nome: m.nome || "—",
