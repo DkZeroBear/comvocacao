@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Plus, Trash2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type Tipo = "equipe" | "banda";
+export type Tipo = "equipe" | "banda" | "prefeitura" | "comissao";
 
 export type FormValues = {
   tipo: Tipo | "";
@@ -26,19 +26,36 @@ export type FormValues = {
   membros: { nome: string; funcao: string }[];
 };
 
+export const TIPOS = [
+  { value: "equipe", title: "Equipe", sub: "Setor e equipes de apoio ao evento" },
+  { value: "banda", title: "Banda / Artista", sub: "Músicos e equipe artística" },
+  {
+    value: "prefeitura",
+    title: "Prefeitura / Convidados",
+    sub: "Autoridades e convidados oficiais",
+  },
+  {
+    value: "comissao",
+    title: "Comissão Organizadora",
+    sub: "Membros da comissão do evento",
+  },
+] as const;
+
+export function tipoLabel(value?: string | null) {
+  return TIPOS.find((t) => t.value === value)?.title ?? "";
+}
+
 export const SETORES = [
   { value: "palco", label: "Equipe Palco" },
   { value: "camarim", label: "Equipe Camarim" },
   { value: "press", label: "Equipe Press" },
   { value: "tecnica", label: "Equipe Técnica" },
-  { value: "prefeitura", label: "Prefeitura / Convidados" },
 ] as const;
 
 export function setorLabel(value?: string | null) {
   return SETORES.find((s) => s.value === value)?.label ?? "";
 }
 
-export const FUNCOES_EQUIPE = ["Comissão", "Apresentador(a)"];
 export const FUNCOES_BANDA = [
   "Cantor(a)",
   "Músico(a)",
@@ -47,7 +64,32 @@ export const FUNCOES_BANDA = [
   "Fotógrafo/Videomaker",
   "Acompanhante",
 ];
+
+export const FUNCOES_POR_SETOR: Record<string, string[]> = {
+  palco: ["Apoio (Staff)", "Apresentador(a)"],
+  camarim: ["Apoio (Staff)"],
+  tecnica: ["Som", "Iluminação", "Transmissão/Streaming", "Apoio técnico"],
+  press: ["Fotógrafo(a)", "Videomaker", "Apoio (Staff)"],
+};
+
+export const FUNCOES_PREFEITURA = [
+  "Prefeito",
+  "Vice",
+  "Vereador(a)",
+  "Assessoria",
+  "Convidado(a)",
+];
+
+/** Opções e rótulo do campo de função/cargo conforme tipo e setor. */
+export function funcaoConfig(tipo: string, setor: string): { label: string; opcoes: string[] | null } {
+  if (tipo === "banda") return { label: "Função", opcoes: FUNCOES_BANDA };
+  if (tipo === "equipe") return { label: "Função", opcoes: FUNCOES_POR_SETOR[setor] ?? [] };
+  if (tipo === "prefeitura") return { label: "Cargo", opcoes: FUNCOES_PREFEITURA };
+  return { label: "Função", opcoes: null };
+}
+
 export const DIAS = ["Dia 15", "Dia 16", "Ambos os dias"];
+
 
 export const emptyFormValues: FormValues = {
   tipo: "",
