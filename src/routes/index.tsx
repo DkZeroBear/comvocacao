@@ -75,7 +75,7 @@ function Index() {
             />
             <div className="min-w-0">
               <h1 className="text-2xl tracking-tight text-foreground font-extrabold sm:text-4xl">
-                ComVocação
+                ComVocação - 23 anos
               </h1>
               <p className="text-sm sm:text-base mt-0.5 text-secondary font-medium">
                 Festa em prol das vocações sacerdotais
