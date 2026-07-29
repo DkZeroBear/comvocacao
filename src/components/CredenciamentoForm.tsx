@@ -166,6 +166,8 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       if (!values.horario_chegada) return toast.error("Informe o horário previsto de chegada.");
       if (!values.quantidade_pessoas || Number(values.quantidade_pessoas) < 1)
         return toast.error("Informe a quantidade estimada de pessoas.");
+    } else if (!values.setor) {
+      return toast.error("Selecione o setor da equipe.");
     }
 
     if (!values.membros.filter((m) => m.nome.trim()).length)
