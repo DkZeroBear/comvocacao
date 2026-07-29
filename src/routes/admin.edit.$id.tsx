@@ -9,6 +9,7 @@ import {
   buildPayload,
   emptyFormValues,
   maskPhone,
+  temResponsavel,
   type FormValues,
 } from "@/components/CredenciamentoForm";
 
