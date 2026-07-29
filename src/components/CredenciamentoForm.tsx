@@ -23,7 +23,7 @@ export type FormValues = {
   nome_banda: string;
   horario_chegada: string;
   veiculos: { marca_modelo: string; cor: string; placa: string }[];
-  membros: { nome: string; funcao: string }[];
+  membros: { nome: string; funcao: string; whatsapp?: string }[];
 };
 
 export const TIPOS = [
@@ -104,7 +104,7 @@ export const emptyFormValues: FormValues = {
   nome_banda: "",
   horario_chegada: "",
   veiculos: [],
-  membros: [{ nome: "", funcao: "" }],
+  membros: [{ nome: "", funcao: "", whatsapp: "" }],
 };
 
 
@@ -117,20 +117,38 @@ export function maskPhone(v: string) {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
+/** Tipos que informam um responsável pelo cadastro. */
+export function temResponsavel(tipo: string) {
+  return tipo === "banda" || tipo === "prefeitura";
+}
+
+/** Tipos em que cada membro informa um contato próprio. */
+export function membroTemWhatsapp(tipo: string) {
+  return tipo === "equipe" || tipo === "comissao";
+}
+
 /** Monta o payload de banco a partir dos valores do formulário. */
 export function buildPayload(values: FormValues) {
   const isBanda = values.tipo === "banda";
-  const membrosFiltrados = values.membros.filter((m) => m.nome.trim());
+  const comResponsavel = temResponsavel(values.tipo);
+  const comWhatsapp = membroTemWhatsapp(values.tipo);
+  const membrosFiltrados = values.membros
+    .filter((m) => m.nome.trim())
+    .map((m) => ({
+      nome: m.nome.trim(),
+      funcao: m.funcao,
+      ...(comWhatsapp ? { whatsapp: (m.whatsapp ?? "").trim() } : {}),
+    }));
   return {
     tipo: tipoLabel(values.tipo),
     setor: values.tipo === "equipe" ? values.setor || null : null,
     dias: values.dias,
-    responsavel_nome: isBanda
+    responsavel_nome: comResponsavel
       ? values.responsavel_nome.trim()
       : membrosFiltrados[0]?.nome ?? "",
-    responsavel_whatsapp: isBanda ? values.responsavel_whatsapp.trim() : "—",
-    eh_produtor: isBanda ? values.eh_produtor === "sim" : null,
-    pode_contatar: isBanda ? values.pode_contatar === "sim" : null,
+    responsavel_whatsapp: comResponsavel ? values.responsavel_whatsapp.trim() : "—",
+    eh_produtor: comResponsavel ? values.eh_produtor === "sim" : null,
+    pode_contatar: comResponsavel ? values.pode_contatar === "sim" : null,
     quantidade_pessoas: isBanda ? Number(values.quantidade_pessoas) : membrosFiltrados.length,
     observacoes: values.observacoes.trim() || null,
     nome_banda: isBanda ? values.nome_banda.trim() : null,
@@ -202,13 +220,20 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
     if (!values.dias.length) return toast.error("Selecione ao menos um dia de presença.");
 
     const isBanda = values.tipo === "banda";
+    const comResponsavel = temResponsavel(values.tipo);
 
-    if (isBanda) {
+    if (comResponsavel) {
       if (!values.responsavel_nome.trim()) return toast.error("Informe o nome do responsável.");
       if (!values.responsavel_whatsapp.trim())
         return toast.error("Informe o WhatsApp do responsável.");
-      if (!values.eh_produtor) return toast.error("Informe se é produtor(a).");
+      if (!values.eh_produtor)
+        return toast.error(
+          isBanda ? "Informe se é produtor(a)." : "Informe se é assessor(a) do prefeito."
+        );
       if (!values.pode_contatar) return toast.error("Informe se podemos entrar em contato.");
+    }
+
+    if (isBanda) {
       if (!values.nome_banda.trim()) return toast.error("Informe o nome da banda ou artista.");
       if (!values.horario_chegada) return toast.error("Informe o horário previsto de chegada.");
       if (!values.quantidade_pessoas || Number(values.quantidade_pessoas) < 1)
@@ -217,9 +242,11 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       return toast.error("Selecione o setor da equipe.");
     }
 
+    const membrosPreenchidos = values.membros.filter((m) => m.nome.trim());
+    if (!membrosPreenchidos.length) return toast.error("Adicione ao menos um membro.");
 
-    if (!values.membros.filter((m) => m.nome.trim()).length)
-      return toast.error("Adicione ao menos um membro.");
+    if (membroTemWhatsapp(values.tipo) && membrosPreenchidos.some((m) => !(m.whatsapp ?? "").trim()))
+      return toast.error("Informe o WhatsApp ou contato de emergência de cada membro.");
 
     await onSubmit(values);
   };
@@ -280,9 +307,17 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
     </section>
   );
 
+  const comWhatsappMembro = membroTemWhatsapp(tipo);
+
   const membrosSection = (titulo: string, opcoes: string[] | null, rotulo = "Função") => (
     <section className="space-y-4">
       <SectionTitle>{titulo}</SectionTitle>
+      {tipo === "prefeitura" && (
+        <p className="text-sm text-secondary">
+          Quem vai comparecer no evento — pode ser diferente de quem está preenchendo este
+          formulário.
+        </p>
+      )}
       <div className="space-y-3">
         {membros.fields.map((f, i) => (
           <div key={f.id} className="rounded-xl border border-border bg-card p-4 space-y-3">
@@ -317,6 +352,25 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
                   </select>
                 </div>
               )}
+              {comWhatsappMembro && (
+                <div>
+                  <Label className="text-sm">
+                    WhatsApp ou Contato de Emergência <span className="text-destructive">*</span>
+                  </Label>
+                  <Controller
+                    control={form.control}
+                    name={`membros.${i}.whatsapp`}
+                    render={({ field }) => (
+                      <Input
+                        inputMode="tel"
+                        placeholder="(00) 00000-0000"
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(maskPhone(e.target.value))}
+                      />
+                    )}
+                  />
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -326,10 +380,86 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
         type="button"
         variant="outline"
         className="w-full"
-        onClick={() => membros.append({ nome: "", funcao: "" })}
+        onClick={() => membros.append({ nome: "", funcao: "", whatsapp: "" })}
       >
         <Plus className="w-4 h-4 mr-1" /> Adicionar membro
       </Button>
+    </section>
+  );
+
+  const responsavelSection = (
+    <section className="space-y-4">
+      <SectionTitle>Responsável pelo cadastro</SectionTitle>
+      <div className="rounded-md border border-foreground/30 bg-foreground/5 px-4 py-3 text-sm">
+        {tipo === "prefeitura"
+          ? "Quem está preenchendo este formulário em nome do prefeito ou da comissão da prefeitura."
+          : "Quem está preenchendo este formulário em nome da banda ou artista."}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <Label className="text-sm">
+            Nome completo <span className="text-destructive">*</span>
+          </Label>
+          <Input placeholder="Seu nome" {...form.register("responsavel_nome")} />
+        </div>
+        <div>
+          <Label className="text-sm">
+            WhatsApp <span className="text-destructive">*</span>
+          </Label>
+          <Controller
+            control={form.control}
+            name="responsavel_whatsapp"
+            render={({ field }) => (
+              <Input
+                inputMode="tel"
+                placeholder="(00) 00000-0000"
+                value={field.value}
+                onChange={(e) => field.onChange(maskPhone(e.target.value))}
+              />
+            )}
+          />
+        </div>
+      </div>
+      <div>
+        <Label className="text-sm">
+          {tipo === "prefeitura" ? "É assessor(a) do prefeito?" : "É produtor(a)?"}{" "}
+          <span className="text-destructive">*</span>
+        </Label>
+        <Controller
+          control={form.control}
+          name="eh_produtor"
+          render={({ field }) => (
+            <div className="flex gap-2 mt-1.5">
+              <Pill active={field.value === "sim"} onClick={() => field.onChange("sim")}>
+                Sim
+              </Pill>
+              <Pill active={field.value === "nao"} onClick={() => field.onChange("nao")}>
+                Não
+              </Pill>
+            </div>
+          )}
+        />
+      </div>
+      <div>
+        <Label className="text-sm">
+          Podemos entrar em contato com este número caso necessário?{" "}
+          <span className="text-destructive">*</span>
+        </Label>
+        <Controller
+          control={form.control}
+          name="pode_contatar"
+          render={({ field }) => (
+            <div className="flex gap-2 mt-1.5">
+              <Pill active={field.value === "sim"} onClick={() => field.onChange("sim")}>
+                Sim
+              </Pill>
+              <Pill active={field.value === "nao"} onClick={() => field.onChange("nao")}>
+                Não
+              </Pill>
+            </div>
+          )}
+        />
+      </div>
     </section>
   );
 
@@ -458,6 +588,7 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       {/* Equipe / Prefeitura / Comissão — bloco compartilhado */}
       {(tipo === "equipe" || tipo === "prefeitura" || tipo === "comissao") && (
         <>
+          {tipo === "prefeitura" && responsavelSection}
           {membrosSection(
             tipo === "equipe"
               ? "Membros da equipe"
@@ -486,76 +617,9 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       {/* Banda */}
       {tipo === "banda" && (
         <>
-          <section className="space-y-4">
-            <SectionTitle>Responsável pelo cadastro</SectionTitle>
-            <div className="rounded-md border border-foreground/30 bg-foreground/5 px-4 py-3 text-sm">
-              Quem está preenchendo este formulário em nome da banda ou artista.
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm">
-                  Nome completo <span className="text-destructive">*</span>
-                </Label>
-                <Input placeholder="Seu nome" {...form.register("responsavel_nome")} />
-              </div>
-              <div>
-                <Label className="text-sm">
-                  WhatsApp <span className="text-destructive">*</span>
-                </Label>
-                <Controller
-                  control={form.control}
-                  name="responsavel_whatsapp"
-                  render={({ field }) => (
-                    <Input
-                      inputMode="tel"
-                      placeholder="(00) 00000-0000"
-                      value={field.value}
-                      onChange={(e) => field.onChange(maskPhone(e.target.value))}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-sm">
-                É produtor(a)? <span className="text-destructive">*</span>
-              </Label>
-              <Controller
-                control={form.control}
-                name="eh_produtor"
-                render={({ field }) => (
-                  <div className="flex gap-2 mt-1.5">
-                    <Pill active={field.value === "sim"} onClick={() => field.onChange("sim")}>
-                      Sim
-                    </Pill>
-                    <Pill active={field.value === "nao"} onClick={() => field.onChange("nao")}>
-                      Não
-                    </Pill>
-                  </div>
-                )}
-              />
-            </div>
-            <div>
-              <Label className="text-sm">
-                Podemos entrar em contato com este número caso necessário?{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <Controller
-                control={form.control}
-                name="pode_contatar"
-                render={({ field }) => (
-                  <div className="flex gap-2 mt-1.5">
-                    <Pill active={field.value === "sim"} onClick={() => field.onChange("sim")}>
-                      Sim
-                    </Pill>
-                    <Pill active={field.value === "nao"} onClick={() => field.onChange("nao")}>
-                      Não
-                    </Pill>
-                  </div>
-                )}
-              />
-            </div>
-          </section>
+          {responsavelSection}
+
+
 
           <section className="space-y-4">
             <SectionTitle>Banda / Artista</SectionTitle>
