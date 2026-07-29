@@ -32,7 +32,7 @@ export const TIPOS = [
   {
     value: "prefeitura",
     title: "Prefeitura / Convidados",
-    sub: "Autoridades e convidados oficiais",
+    sub: "Autoridades e convidados",
   },
   {
     value: "comissao",
