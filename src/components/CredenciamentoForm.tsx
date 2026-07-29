@@ -23,7 +23,7 @@ export type FormValues = {
   nome_banda: string;
   horario_chegada: string;
   veiculos: { marca_modelo: string; cor: string; placa: string }[];
-  membros: { nome: string; funcao: string }[];
+  membros: { nome: string; funcao: string; whatsapp?: string }[];
 };
 
 export const TIPOS = [
