@@ -406,7 +406,18 @@ function renderOrganizationView(
     doc.line(blockX, y, blockX + blockW, y);
     y += 6;
   }
+
+  // Prefeitura / Convidados
+  if (prefeitura.length > 0) {
+    y = renderGrupo(doc, y, drawHead, "Prefeitura / Convidados", prefeitura, "Cargo");
+  }
+
+  // Comissão Organizadora
+  if (comissao.length > 0) {
+    y = renderGrupo(doc, y, drawHead, "Comissão Organizadora", comissao, null);
+  }
 }
+
 
 function renderSecurityView(
   doc: jsPDF,
