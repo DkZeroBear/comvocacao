@@ -64,12 +64,6 @@ function Admin() {
               {totalComissao} Comissão · Dia 15: {countDia("15")} · Dia 16:{" "}
               {countDia("16")} · Qtd. veículos: {totalVeiculos}
             </p>
-            <Link
-              to="/admin/evento"
-              className="inline-block mt-2 text-sm text-muted-foreground hover:underline"
-            >
-              Painel do dia (visão simplificada)
-            </Link>
           </div>
           <div className="flex gap-2">
             <Button onClick={exportXlsx} disabled={!rows.length}>
