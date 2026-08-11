@@ -7,7 +7,7 @@ import { Download, ArrowLeft, LogOut, FileText, Trash2, Pencil } from "lucide-re
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import * as XLSX from "xlsx";
-import { exportConvocacaoPdf } from "@/lib/pdf-export";
+import { exportConvocacaoPdf, exportContatosPdf } from "@/lib/pdf-export";
 import { setorLabel } from "@/components/CredenciamentoForm";
 
 export const Route = createFileRoute("/admin/")({
@@ -276,6 +276,26 @@ function Admin() {
               disabled={!rows.length}
             >
               <FileText className="w-4 h-4 mr-2" /> Exportar PDF
+            </Button>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (
+                  !window.confirm(
+                    "Este documento contém todos os telefones de contato. Distribua apenas para a coordenação. Deseja continuar?"
+                  )
+                )
+                  return;
+                try {
+                  await exportContatosPdf(rows);
+                } catch (e) {
+                  console.error(e);
+                  toast.error("Erro ao gerar PDF de contatos");
+                }
+              }}
+              disabled={!rows.length}
+            >
+              <FileText className="w-4 h-4 mr-2" /> Exportar Contatos (uso restrito)
             </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" /> Sair
