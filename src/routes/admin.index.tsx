@@ -106,12 +106,15 @@ function Admin() {
   const inDia = (r: Row, dia: string) =>
     (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"));
 
-  const totalEquipe = rows.filter((r) => tipoKey(r) === "equipe").length;
-  const totalBanda = rows.filter((r) => tipoKey(r) === "banda").length;
-  const totalPrefeitura = rows.filter((r) => tipoKey(r) === "prefeitura").length;
-  const totalComissao = rows.filter((r) => tipoKey(r) === "comissao").length;
-  const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
-  const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
+  const { totalEquipe, totalBanda, totalPrefeitura, totalComissao, countDia, totalVeiculos } = useMemo(() => {
+    const totalEquipe = rows.filter((r) => tipoKey(r) === "equipe").length;
+    const totalBanda = rows.filter((r) => tipoKey(r) === "banda").length;
+    const totalPrefeitura = rows.filter((r) => tipoKey(r) === "prefeitura").length;
+    const totalComissao = rows.filter((r) => tipoKey(r) === "comissao").length;
+    const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
+    const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
+    return { totalEquipe, totalBanda, totalPrefeitura, totalComissao, countDia, totalVeiculos };
+  }, [rows]);
 
   const filtered = rows.filter((r) => {
     if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
