@@ -12,6 +12,7 @@ import {
 } from "@/components/CredenciamentoForm";
 import logoComvocacao from "@/assets/comvocacao-logo-2026.png.asset.json";
 import textura from "@/assets/comvocacao-textura.png.asset.json";
+import comvocacaoBanner from "@/assets/comvocacao-banner-2026.png.asset.json";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -59,6 +60,12 @@ function Index() {
     <div className="min-h-screen bg-background text-foreground">
       <Toaster />
       <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+        <img
+          src={comvocacaoBanner.url}
+          alt="ComVocação — 23 anos"
+          className="w-full h-auto rounded-2xl mb-6"
+        />
+
         <header className="mb-10 rounded-2xl border border-border overflow-hidden shadow-sm relative">
           <div
             className="absolute inset-0 opacity-25 bg-cover bg-center"
@@ -74,10 +81,7 @@ function Index() {
               className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-border"
             />
             <div className="min-w-0">
-              <h1 className="text-2xl tracking-tight text-foreground font-extrabold sm:text-4xl">
-                ComVocação – 23 anos
-              </h1>
-              <p className="text-sm sm:text-base mt-0.5 text-secondary font-medium">
+              <p className="text-sm sm:text-base text-secondary font-medium">
                 Festa em prol das vocações sacerdotais
               </p>
               <p className="text-sm mt-3 leading-relaxed text-secondary">
