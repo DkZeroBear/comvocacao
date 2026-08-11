@@ -126,6 +126,7 @@ function rgbFromHex(hex: string): [number, number, number] {
 function tableTheme() {
   return {
     theme: "grid" as const,
+    rowPageBreak: "avoid" as const,
     styles: {
       font: "helvetica",
       fontSize: 9,
@@ -165,7 +166,8 @@ function renderGrupo(
   drawHead: () => void,
   label: string,
   registros: Credenciamento[],
-  funcaoHeader: string | null
+  funcaoHeader: string | null,
+  qtdSimples = false
 ): number {
   let y = ensureSpace(doc, yStart, 20, drawHead);
   y = sectionTitle(doc, label, y);
@@ -205,18 +207,27 @@ function renderGrupo(
   y = ensureSpace(doc, y, 8, drawHead);
   const qtdEst = registros.reduce((a, r) => a + (r.quantidade_pessoas ?? 0), 0);
   doc.setFontSize(9);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(COLOR_LABEL);
-  doc.text("Qtd. estimada:", 16, y);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(COLOR_TEXT);
-  doc.text(String(qtdEst), 46, y);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(COLOR_LABEL);
-  doc.text("Qtd. cadastrada:", 84, y);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(COLOR_TEXT);
-  doc.text(String(membrosBody.length), 119, y);
+  if (qtdSimples) {
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(COLOR_LABEL);
+    doc.text("Qtd. de pessoas:", 16, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(COLOR_TEXT);
+    doc.text(String(membrosBody.length), 51, y);
+  } else {
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(COLOR_LABEL);
+    doc.text("Qtd. estimada:", 16, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(COLOR_TEXT);
+    doc.text(String(qtdEst), 46, y);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(COLOR_LABEL);
+    doc.text("Qtd. cadastrada:", 84, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(COLOR_TEXT);
+    doc.text(String(membrosBody.length), 119, y);
+  }
   y += 6;
 
   // Observações
@@ -269,7 +280,7 @@ function renderOrganizationView(
   ].filter((g) => g.registros.length > 0);
 
   for (const grupo of grupos) {
-    y = renderGrupo(doc, y, drawHead, grupo.label, grupo.registros, "Função");
+    y = renderGrupo(doc, y, drawHead, grupo.label, grupo.registros, "Função", true);
   }
 
 
@@ -285,6 +296,7 @@ function renderOrganizationView(
     doc.setFontSize(10);
     doc.setTextColor(COLOR_LABEL);
     doc.text("Nenhuma banda/artista cadastrada para este dia.", 14, y);
+    y += 10;
   }
 
   for (const b of bandas) {
@@ -414,7 +426,7 @@ function renderOrganizationView(
 
   // Comissão Organizadora
   if (comissao.length > 0) {
-    y = renderGrupo(doc, y, drawHead, "Comissão Organizadora", comissao, null);
+    y = renderGrupo(doc, y, drawHead, "Comissão Organizadora", comissao, null, true);
   }
 }
 
