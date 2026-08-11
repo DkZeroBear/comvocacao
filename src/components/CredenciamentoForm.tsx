@@ -363,7 +363,10 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
               </div>
               {opcoes && (
                 <div>
-                  <Label className="text-sm">{rotulo}</Label>
+                  <Label className="text-sm">
+                    {rotulo} <span className="text-destructive">*</span>
+                  </Label>
+
                   <select
                     className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
                     {...form.register(`membros.${i}.funcao`)}
