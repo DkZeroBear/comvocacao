@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, ArrowLeft, LogOut, FileText, Trash2, Pencil } from "lucide-react";
+import { Download, ArrowLeft, LogOut, FileText, Trash2, Pencil, LayoutDashboard } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { useCredenciamentos } from "@/hooks/useCredenciamentos";
 import { CredenciamentoCard } from "@/components/CredenciamentoCard";
