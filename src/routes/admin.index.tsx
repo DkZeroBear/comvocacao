@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, ArrowLeft, LogOut, FileText, Trash2, Pencil } from "lucide-react";
+import { Download, ArrowLeft, LogOut, FileText, Trash2, Pencil, LayoutDashboard } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { useCredenciamentos } from "@/hooks/useCredenciamentos";
 import { CredenciamentoCard } from "@/components/CredenciamentoCard";
@@ -64,12 +64,6 @@ function Admin() {
               {totalComissao} Comissão · Dia 15: {countDia("15")} · Dia 16:{" "}
               {countDia("16")} · Qtd. veículos: {totalVeiculos}
             </p>
-            <Link
-              to="/admin/evento"
-              className="inline-block mt-2 text-sm text-muted-foreground hover:underline"
-            >
-              Painel do dia (visão simplificada)
-            </Link>
           </div>
           <div className="flex gap-2">
             <Button onClick={exportXlsx} disabled={!rows.length}>
@@ -80,6 +74,11 @@ function Admin() {
             </Button>
             <Button variant="outline" onClick={exportContatos} disabled={!rows.length}>
               <FileText className="w-4 h-4 mr-2" /> Exportar Contatos (uso restrito)
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/admin/evento">
+                <LayoutDashboard className="w-4 h-4 mr-2" /> Painel do dia
+              </Link>
             </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" /> Sair
