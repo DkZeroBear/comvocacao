@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import logoAsset from "@/assets/comvocacao-logo-2026.png.asset.json";
 
-export type Membro = { nome: string; funcao: string };
+export type Membro = { nome: string; funcao: string; whatsapp?: string };
 export type Veiculo = { marca_modelo: string; cor: string; placa: string };
 
 export type Credenciamento = {
