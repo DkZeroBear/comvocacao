@@ -172,10 +172,13 @@ function renderGrupo(
   let y = ensureSpace(doc, yStart, 20, drawHead);
   y = sectionTitle(doc, label, y);
 
-  const membrosBody = registros.flatMap((r) =>
-    (r.membros || []).map((m) =>
-      funcaoHeader ? [m.nome || "—", m.funcao || "—"] : [m.nome || "—"]
-    )
+  const todosMembros = registros.flatMap((r) => r.membros || []);
+  todosMembros.sort((a, b) =>
+    (a.nome || "").localeCompare(b.nome || "", "pt-BR", { sensitivity: "base" })
+  );
+
+  const membrosBody = todosMembros.map((m) =>
+    funcaoHeader ? [m.nome || "—", m.funcao || "—"] : [m.nome || "—"]
   );
   if (membrosBody.length > 0) {
     autoTable(doc, {
@@ -364,13 +367,16 @@ function renderOrganizationView(
     y += 6;
 
     // Tabela de membros
-    if ((b.membros || []).length > 0) {
+    const membrosBanda = [...(b.membros || [])].sort((a, b) =>
+      (a.nome || "").localeCompare(b.nome || "", "pt-BR", { sensitivity: "base" })
+    );
+    if (membrosBanda.length > 0) {
       y = ensureSpace(doc, y, 18, drawHead);
       autoTable(doc, {
         ...tableTheme(),
         startY: y,
         head: [["Nome completo", "Função"]],
-        body: b.membros.map((m) => [m.nome || "—", m.funcao || "—"]),
+        body: membrosBanda.map((m) => [m.nome || "—", m.funcao || "—"]),
         margin: { left: blockX, right: 14 },
         tableWidth: blockW,
         didDrawPage: drawHead,
