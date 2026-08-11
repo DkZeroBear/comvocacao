@@ -300,7 +300,10 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
                 <Input placeholder="Ex: Prata" {...form.register(`veiculos.${i}.cor`)} />
               </div>
               <div>
-                <Label className="text-sm">Placa</Label>
+                <Label className="text-sm">
+                  Placa <span className="text-destructive">*</span>
+                </Label>
+
                 <Controller
                   control={form.control}
                   name={`veiculos.${i}.placa`}
