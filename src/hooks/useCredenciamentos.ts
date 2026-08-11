@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
-import { exportConvocacaoPdf, exportContatosPdf } from "@/lib/pdf-export";
 import { setorLabel } from "@/components/CredenciamentoForm";
 
 export type Row = {
@@ -135,6 +133,7 @@ export function useCredenciamentos() {
 
   const exportPdf = async () => {
     try {
+      const { exportConvocacaoPdf } = await import("@/lib/pdf-export");
       await exportConvocacaoPdf(rows);
     } catch (e) {
       console.error(e);
@@ -150,6 +149,7 @@ export function useCredenciamentos() {
     )
       return;
     try {
+      const { exportContatosPdf } = await import("@/lib/pdf-export");
       await exportContatosPdf(rows);
     } catch (e) {
       console.error(e);
@@ -157,7 +157,8 @@ export function useCredenciamentos() {
     }
   };
 
-  const exportXlsx = () => {
+  const exportXlsx = async () => {
+    const XLSX = await import("xlsx");
     const main = rows.map((r) => ({
       ID: r.id,
       "Data de envio": new Date(r.created_at).toLocaleString("pt-BR"),
