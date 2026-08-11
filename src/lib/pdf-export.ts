@@ -1,5 +1,6 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import type jsPDF from "jspdf";
+
+type AutoTable = typeof import("jspdf-autotable").default;
 import logoAsset from "@/assets/comvocacao-logo-2026.png.asset.json";
 
 export type Membro = { nome: string; funcao: string; whatsapp?: string };
@@ -162,6 +163,7 @@ const getFinalY = (doc: jsPDF) =>
  */
 function renderGrupo(
   doc: jsPDF,
+  at: AutoTable,
   yStart: number,
   drawHead: () => void,
   label: string,
@@ -181,7 +183,7 @@ function renderGrupo(
     funcaoHeader ? [m.nome || "—", m.funcao || "—"] : [m.nome || "—"]
   );
   if (membrosBody.length > 0) {
-    autoTable(doc, {
+    at(doc, {
       ...tableTheme(),
       startY: y,
       head: [funcaoHeader ? ["Nome completo", funcaoHeader] : ["Nome completo"]],
@@ -195,7 +197,7 @@ function renderGrupo(
   const veics = registros.flatMap((r) => r.veiculos || []);
   if (veics.length > 0) {
     y = ensureSpace(doc, y, 18, drawHead);
-    autoTable(doc, {
+    at(doc, {
       ...tableTheme(),
       startY: y,
       head: [["Marca / Modelo", "Cor", "Placa"]],
@@ -256,6 +258,7 @@ function renderGrupo(
 
 function renderOrganizationView(
   doc: jsPDF,
+  at: AutoTable,
   logo: string | null,
   day: Day,
   rows: Credenciamento[]
@@ -283,7 +286,7 @@ function renderOrganizationView(
   ].filter((g) => g.registros.length > 0);
 
   for (const grupo of grupos) {
-    y = renderGrupo(doc, y, drawHead, grupo.label, grupo.registros, "Função", true);
+    y = renderGrupo(doc, at, y, drawHead, grupo.label, grupo.registros, "Função", true);
   }
 
 
@@ -372,7 +375,7 @@ function renderOrganizationView(
     );
     if (membrosBanda.length > 0) {
       y = ensureSpace(doc, y, 18, drawHead);
-      autoTable(doc, {
+      at(doc, {
         ...tableTheme(),
         startY: y,
         head: [["Nome completo", "Função"]],
@@ -387,7 +390,7 @@ function renderOrganizationView(
     // Tabela de veículos
     if ((b.veiculos || []).length > 0) {
       y = ensureSpace(doc, y, 18, drawHead);
-      autoTable(doc, {
+      at(doc, {
         ...tableTheme(),
         startY: y,
         head: [["Marca / Modelo", "Cor", "Placa"]],
@@ -427,18 +430,19 @@ function renderOrganizationView(
 
   // Prefeitura / Convidados
   if (prefeitura.length > 0) {
-    y = renderGrupo(doc, y, drawHead, "Prefeitura / Convidados", prefeitura, "Cargo");
+    y = renderGrupo(doc, at, y, drawHead, "Prefeitura / Convidados", prefeitura, "Cargo");
   }
 
   // Comissão Organizadora
   if (comissao.length > 0) {
-    y = renderGrupo(doc, y, drawHead, "Comissão Organizadora", comissao, null, true);
+    y = renderGrupo(doc, at, y, drawHead, "Comissão Organizadora", comissao, null, true);
   }
 }
 
 
 function renderSecurityView(
   doc: jsPDF,
+  at: AutoTable,
   logo: string | null,
   day: Day,
   rows: Credenciamento[]
@@ -483,7 +487,7 @@ function renderSecurityView(
 
   const body = people.map((p) => [p.nome, p.funcao, p.grupo, ""]);
 
-  autoTable(doc, {
+  at(doc, {
     ...tableTheme(),
     startY: 40,
     head: [["Nome completo", "Função", "Banda / Equipe", "Credenciado"]],
@@ -528,19 +532,21 @@ function renderSecurityView(
 }
 
 export async function exportConvocacaoPdf(rows: Credenciamento[]) {
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const { default: JsPDF } = await import("jspdf");
+  const { default: at } = await import("jspdf-autotable");
+  const doc = new JsPDF({ unit: "mm", format: "a4" });
   const logo = await loadLogoDataUrl();
 
   // Dia 15 — Organização
-  renderOrganizationView(doc, logo, "Dia 15", rows);
+  renderOrganizationView(doc, at, logo, "Dia 15", rows);
   // Dia 15 — Segurança
-  renderSecurityView(doc, logo, "Dia 15", rows);
+  renderSecurityView(doc, at, logo, "Dia 15", rows);
 
   // Dia 16 — Organização
   doc.addPage();
-  renderOrganizationView(doc, logo, "Dia 16", rows);
+  renderOrganizationView(doc, at, logo, "Dia 16", rows);
   // Dia 16 — Segurança
-  renderSecurityView(doc, logo, "Dia 16", rows);
+  renderSecurityView(doc, at, logo, "Dia 16", rows);
 
   doc.save("credenciamento-comvocacao.pdf");
 }
@@ -567,7 +573,9 @@ const TIPOS_CONTATO = [
 ] as const;
 
 export async function exportContatosPdf(rows: Credenciamento[]) {
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const { default: JsPDF } = await import("jspdf");
+  const { default: at } = await import("jspdf-autotable");
+  const doc = new JsPDF({ unit: "mm", format: "a4" });
   const logo = await loadLogoDataUrl();
 
   const contatos: Contato[] = [];
@@ -656,7 +664,7 @@ export async function exportContatosPdf(rows: Credenciamento[]) {
     y = ensureSpace(doc, y, 20, drawHead);
     y = sectionTitle(doc, tipo, y);
 
-    autoTable(doc, {
+    at(doc, {
       ...tableTheme(),
       startY: y,
       head: [["Nome", "WhatsApp", "Papel(is)"]],
