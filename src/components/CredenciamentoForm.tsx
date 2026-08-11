@@ -242,11 +242,33 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       return toast.error("Selecione o setor da equipe.");
     }
 
+    const membroIncompleto = values.membros.some(
+      (m) => !m.nome.trim() && (m.funcao.trim() || (m.whatsapp ?? "").trim()),
+    );
+    if (membroIncompleto)
+      return toast.error(
+        "Um dos membros tem função ou WhatsApp preenchidos, mas está sem nome. Informe o nome ou remova a linha.",
+      );
+
     const membrosPreenchidos = values.membros.filter((m) => m.nome.trim());
     if (!membrosPreenchidos.length) return toast.error("Adicione ao menos um membro.");
 
     if (membroTemWhatsapp(values.tipo) && membrosPreenchidos.some((m) => !(m.whatsapp ?? "").trim()))
       return toast.error("Informe o WhatsApp ou contato de emergência de cada membro.");
+
+    if (funcoes && membrosPreenchidos.some((m) => !m.funcao.trim()))
+      return toast.error(
+        `Informe ${funcaoLabel === "Cargo" ? "o cargo" : "a função"} de cada membro cadastrado.`,
+      );
+
+    const veiculosPreenchidos = values.veiculos.filter(
+      (v) => v.marca_modelo.trim() || v.cor.trim() || v.placa.trim(),
+    );
+    if (veiculosPreenchidos.some((v) => !v.placa.trim()))
+      return toast.error(
+        "Informe a placa de todos os veículos cadastrados (ou remova o veículo, se não for usar).",
+      );
+
 
     await onSubmit(values);
   };
@@ -278,7 +300,10 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
                 <Input placeholder="Ex: Prata" {...form.register(`veiculos.${i}.cor`)} />
               </div>
               <div>
-                <Label className="text-sm">Placa</Label>
+                <Label className="text-sm">
+                  Placa <span className="text-destructive">*</span>
+                </Label>
+
                 <Controller
                   control={form.control}
                   name={`veiculos.${i}.placa`}
@@ -338,7 +363,10 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
               </div>
               {opcoes && (
                 <div>
-                  <Label className="text-sm">{rotulo}</Label>
+                  <Label className="text-sm">
+                    {rotulo} <span className="text-destructive">*</span>
+                  </Label>
+
                   <select
                     className="flex h-9 w-full rounded-md border border-input bg-input text-foreground px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
                     {...form.register(`membros.${i}.funcao`)}
