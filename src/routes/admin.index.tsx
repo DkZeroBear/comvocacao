@@ -46,12 +46,10 @@ function Admin() {
     let active = true;
 
     const load = async (userId: string) => {
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .eq("role", "admin")
-        .maybeSingle();
+      const [{ data: roleData }, { data, error }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle(),
+        supabase.from("credenciamentos").select("*").order("created_at", { ascending: false }),
+      ]);
 
       if (!active) return;
 
@@ -62,12 +60,6 @@ function Admin() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("credenciamentos")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!active) return;
       if (error) toast.error("Erro ao carregar credenciamentos");
       setRows((data as unknown as Row[]) || []);
       setLoading(false);
