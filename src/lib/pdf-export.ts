@@ -172,10 +172,13 @@ function renderGrupo(
   let y = ensureSpace(doc, yStart, 20, drawHead);
   y = sectionTitle(doc, label, y);
 
-  const membrosBody = registros.flatMap((r) =>
-    (r.membros || []).map((m) =>
-      funcaoHeader ? [m.nome || "—", m.funcao || "—"] : [m.nome || "—"]
-    )
+  const todosMembros = registros.flatMap((r) => r.membros || []);
+  todosMembros.sort((a, b) =>
+    (a.nome || "").localeCompare(b.nome || "", "pt-BR", { sensitivity: "base" })
+  );
+
+  const membrosBody = todosMembros.map((m) =>
+    funcaoHeader ? [m.nome || "—", m.funcao || "—"] : [m.nome || "—"]
   );
   if (membrosBody.length > 0) {
     autoTable(doc, {
