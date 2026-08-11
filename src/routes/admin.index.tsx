@@ -7,7 +7,7 @@ import { Download, ArrowLeft, LogOut, FileText, Trash2, Pencil } from "lucide-re
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import * as XLSX from "xlsx";
-import { exportConvocacaoPdf } from "@/lib/pdf-export";
+import { exportConvocacaoPdf, exportContatosPdf } from "@/lib/pdf-export";
 import { setorLabel } from "@/components/CredenciamentoForm";
 
 export const Route = createFileRoute("/admin/")({
