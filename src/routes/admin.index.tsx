@@ -116,20 +116,22 @@ function Admin() {
     return { totalEquipe, totalBanda, totalPrefeitura, totalComissao, countDia, totalVeiculos };
   }, [rows]);
 
-  const filtered = rows.filter((r) => {
-    if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
-    if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
-    const q = busca.trim().toLowerCase();
-    if (!q) return true;
-    const haystack = [
-      r.responsavel_nome,
-      r.nome_banda || "",
-      ...(r.membros || []).map((m) => m.nome),
-    ]
-      .join(" ")
-      .toLowerCase();
-    return haystack.includes(q);
-  });
+  const filtered = useMemo(() => {
+    return rows.filter((r) => {
+      if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
+      if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
+      const q = busca.trim().toLowerCase();
+      if (!q) return true;
+      const haystack = [
+        r.responsavel_nome,
+        r.nome_banda || "",
+        ...(r.membros || []).map((m) => m.nome),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [rows, busca, filtroTipo, filtroDia]);
 
 
 
