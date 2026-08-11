@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -46,12 +46,10 @@ function Admin() {
     let active = true;
 
     const load = async (userId: string) => {
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .eq("role", "admin")
-        .maybeSingle();
+      const [{ data: roleData }, { data, error }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle(),
+        supabase.from("credenciamentos").select("*").order("created_at", { ascending: false }),
+      ]);
 
       if (!active) return;
 
@@ -62,12 +60,6 @@ function Admin() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("credenciamentos")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!active) return;
       if (error) toast.error("Erro ao carregar credenciamentos");
       setRows((data as unknown as Row[]) || []);
       setLoading(false);
@@ -114,27 +106,32 @@ function Admin() {
   const inDia = (r: Row, dia: string) =>
     (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"));
 
-  const totalEquipe = rows.filter((r) => tipoKey(r) === "equipe").length;
-  const totalBanda = rows.filter((r) => tipoKey(r) === "banda").length;
-  const totalPrefeitura = rows.filter((r) => tipoKey(r) === "prefeitura").length;
-  const totalComissao = rows.filter((r) => tipoKey(r) === "comissao").length;
-  const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
-  const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
+  const { totalEquipe, totalBanda, totalPrefeitura, totalComissao, countDia, totalVeiculos } = useMemo(() => {
+    const totalEquipe = rows.filter((r) => tipoKey(r) === "equipe").length;
+    const totalBanda = rows.filter((r) => tipoKey(r) === "banda").length;
+    const totalPrefeitura = rows.filter((r) => tipoKey(r) === "prefeitura").length;
+    const totalComissao = rows.filter((r) => tipoKey(r) === "comissao").length;
+    const countDia = (dia: string) => rows.filter((r) => inDia(r, dia)).length;
+    const totalVeiculos = rows.reduce((acc, r) => acc + (r.veiculos?.length || 0), 0);
+    return { totalEquipe, totalBanda, totalPrefeitura, totalComissao, countDia, totalVeiculos };
+  }, [rows]);
 
-  const filtered = rows.filter((r) => {
-    if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
-    if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
-    const q = busca.trim().toLowerCase();
-    if (!q) return true;
-    const haystack = [
-      r.responsavel_nome,
-      r.nome_banda || "",
-      ...(r.membros || []).map((m) => m.nome),
-    ]
-      .join(" ")
-      .toLowerCase();
-    return haystack.includes(q);
-  });
+  const filtered = useMemo(() => {
+    return rows.filter((r) => {
+      if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
+      if (filtroDia !== "todos" && !inDia(r, filtroDia)) return false;
+      const q = busca.trim().toLowerCase();
+      if (!q) return true;
+      const haystack = [
+        r.responsavel_nome,
+        r.nome_banda || "",
+        ...(r.membros || []).map((m) => m.nome),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [rows, busca, filtroTipo, filtroDia]);
 
 
 
