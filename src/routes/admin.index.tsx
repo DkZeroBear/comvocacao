@@ -75,6 +75,11 @@ function Admin() {
             <Button variant="outline" onClick={exportContatos} disabled={!rows.length}>
               <FileText className="w-4 h-4 mr-2" /> Exportar Contatos (uso restrito)
             </Button>
+            <Button variant="outline" asChild>
+              <Link to="/admin/evento">
+                <LayoutDashboard className="w-4 h-4 mr-2" /> Painel do dia
+              </Link>
+            </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" /> Sair
             </Button>
