@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminEventoRouteImport } from './routes/admin.evento'
 import { Route as AdminEditIdRouteImport } from './routes/admin.edit.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminEventoRoute = AdminEventoRouteImport.update({
+  id: '/admin/evento',
+  path: '/admin/evento',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminEditIdRoute = AdminEditIdRouteImport.update({
   id: '/admin/edit/$id',
   path: '/admin/edit/$id',
@@ -38,12 +44,14 @@ const AdminEditIdRoute = AdminEditIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/admin/evento': typeof AdminEventoRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/edit/$id': typeof AdminEditIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/admin/evento': typeof AdminEventoRoute
   '/admin': typeof AdminIndexRoute
   '/admin/edit/$id': typeof AdminEditIdRoute
 }
@@ -51,20 +59,28 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/admin/evento': typeof AdminEventoRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/edit/$id': typeof AdminEditIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin/' | '/admin/edit/$id'
+  fullPaths: '/' | '/login' | '/admin/evento' | '/admin/' | '/admin/edit/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/admin' | '/admin/edit/$id'
-  id: '__root__' | '/' | '/login' | '/admin/' | '/admin/edit/$id'
+  to: '/' | '/login' | '/admin/evento' | '/admin' | '/admin/edit/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/admin/evento'
+    | '/admin/'
+    | '/admin/edit/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  AdminEventoRoute: typeof AdminEventoRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminEditIdRoute: typeof AdminEditIdRoute
 }
@@ -92,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/evento': {
+      id: '/admin/evento'
+      path: '/admin/evento'
+      fullPath: '/admin/evento'
+      preLoaderRoute: typeof AdminEventoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/edit/$id': {
       id: '/admin/edit/$id'
       path: '/admin/edit/$id'
@@ -105,6 +128,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  AdminEventoRoute: AdminEventoRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminEditIdRoute: AdminEditIdRoute,
 }
