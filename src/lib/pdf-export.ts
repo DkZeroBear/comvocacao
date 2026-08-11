@@ -367,13 +367,16 @@ function renderOrganizationView(
     y += 6;
 
     // Tabela de membros
-    if ((b.membros || []).length > 0) {
+    const membrosBanda = [...(b.membros || [])].sort((a, b) =>
+      (a.nome || "").localeCompare(b.nome || "", "pt-BR", { sensitivity: "base" })
+    );
+    if (membrosBanda.length > 0) {
       y = ensureSpace(doc, y, 18, drawHead);
       autoTable(doc, {
         ...tableTheme(),
         startY: y,
         head: [["Nome completo", "Função"]],
-        body: b.membros.map((m) => [m.nome || "—", m.funcao || "—"]),
+        body: membrosBanda.map((m) => [m.nome || "—", m.funcao || "—"]),
         margin: { left: blockX, right: 14 },
         tableWidth: blockW,
         didDrawPage: drawHead,
