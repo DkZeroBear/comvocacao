@@ -526,3 +526,85 @@ export async function exportConvocacaoPdf(rows: Credenciamento[]) {
 
   doc.save("credenciamento-comvocacao.pdf");
 }
+
+type Contato = {
+  nome: string;
+  whatsapp: string;
+  tipo: string;
+  contexto: string;
+};
+
+export async function exportContatosPdf(rows: Credenciamento[]) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const logo = await loadLogoDataUrl();
+
+  const contatos: Contato[] = [];
+  for (const r of rows) {
+    if (r.tipo === "Equipe" || r.tipo === "Comissão Organizadora") {
+      const contexto =
+        r.tipo === "Equipe"
+          ? SETORES_PDF.find((s) => s.value === r.setor)?.label || "Equipe"
+          : "";
+      for (const m of r.membros || []) {
+        contatos.push({
+          nome: m.nome || "—",
+          whatsapp: m.whatsapp || "—",
+          tipo: r.tipo,
+          contexto,
+        });
+      }
+    } else if (r.tipo === "Banda / Artista" || r.tipo === "Prefeitura / Convidados") {
+      contatos.push({
+        nome: r.responsavel_nome || "—",
+        whatsapp: r.responsavel_whatsapp || "—",
+        tipo: r.tipo,
+        contexto:
+          r.tipo === "Banda / Artista"
+            ? r.nome_banda || "—"
+            : "Responsável do cadastro",
+      });
+    }
+  }
+
+  contatos.sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
+
+  const drawHead = () => {
+    drawHeader(
+      doc,
+      logo,
+      "ComVocação — Lista de Contatos",
+      "(uso restrito)"
+    );
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(8);
+    doc.setTextColor(COLOR_LABEL);
+    doc.text(
+      "Documento de uso restrito à coordenação — não distribuir.",
+      14,
+      36
+    );
+  };
+
+  drawHead();
+
+  autoTable(doc, {
+    ...tableTheme(),
+    startY: 40,
+    head: [["Nome", "WhatsApp", "Tipo", "Contexto"]],
+    body: contatos.length
+      ? contatos.map((c) => [c.nome, c.whatsapp, c.tipo, c.contexto])
+      : [["—", "—", "—", "—"]],
+    columnStyles: {
+      0: { cellWidth: 60 },
+      1: { cellWidth: 35 },
+      2: { cellWidth: 42 },
+      3: { cellWidth: "auto" },
+    },
+    margin: { left: 14, right: 14, top: 40 },
+    didDrawPage: drawHead,
+  });
+
+  doc.save("contatos-comvocacao.pdf");
+}
