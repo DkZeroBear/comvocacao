@@ -277,6 +277,26 @@ function Admin() {
             >
               <FileText className="w-4 h-4 mr-2" /> Exportar PDF
             </Button>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (
+                  !window.confirm(
+                    "Este documento contém todos os telefones de contato. Distribua apenas para a coordenação. Deseja continuar?"
+                  )
+                )
+                  return;
+                try {
+                  await exportContatosPdf(rows);
+                } catch (e) {
+                  console.error(e);
+                  toast.error("Erro ao gerar PDF de contatos");
+                }
+              }}
+              disabled={!rows.length}
+            >
+              <FileText className="w-4 h-4 mr-2" /> Exportar Contatos (uso restrito)
+            </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" /> Sair
             </Button>
