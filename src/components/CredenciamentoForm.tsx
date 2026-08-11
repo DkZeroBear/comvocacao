@@ -242,11 +242,33 @@ export function CredenciamentoForm({ mode, defaultValues, onSubmit, submitLabel 
       return toast.error("Selecione o setor da equipe.");
     }
 
+    const membroIncompleto = values.membros.some(
+      (m) => !m.nome.trim() && (m.funcao.trim() || (m.whatsapp ?? "").trim()),
+    );
+    if (membroIncompleto)
+      return toast.error(
+        "Um dos membros tem função ou WhatsApp preenchidos, mas está sem nome. Informe o nome ou remova a linha.",
+      );
+
     const membrosPreenchidos = values.membros.filter((m) => m.nome.trim());
     if (!membrosPreenchidos.length) return toast.error("Adicione ao menos um membro.");
 
     if (membroTemWhatsapp(values.tipo) && membrosPreenchidos.some((m) => !(m.whatsapp ?? "").trim()))
       return toast.error("Informe o WhatsApp ou contato de emergência de cada membro.");
+
+    if (funcoes && membrosPreenchidos.some((m) => !m.funcao.trim()))
+      return toast.error(
+        `Informe ${funcaoLabel === "Cargo" ? "o cargo" : "a função"} de cada membro cadastrado.`,
+      );
+
+    const veiculosPreenchidos = values.veiculos.filter(
+      (v) => v.marca_modelo.trim() || v.cor.trim() || v.placa.trim(),
+    );
+    if (veiculosPreenchidos.some((v) => !v.placa.trim()))
+      return toast.error(
+        "Informe a placa de todos os veículos cadastrados (ou remova o veículo, se não for usar).",
+      );
+
 
     await onSubmit(values);
   };
