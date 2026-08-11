@@ -546,6 +546,20 @@ type Contato = {
   contexto: string;
 };
 
+type ContatoAgrupado = {
+  nome: string;
+  whatsapp: string;
+  tipo: string;
+  papeis: string[];
+};
+
+const TIPOS_CONTATO = [
+  "Equipe",
+  "Banda / Artista",
+  "Prefeitura / Convidados",
+  "Comissão Organizadora",
+] as const;
+
 export async function exportContatosPdf(rows: Credenciamento[]) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const logo = await loadLogoDataUrl();
@@ -578,9 +592,32 @@ export async function exportContatosPdf(rows: Credenciamento[]) {
     }
   }
 
-  contatos.sort((a, b) =>
-    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  // Ordena por prioridade de tipo para que o agrupado caia na seção correta
+  const prioridade = (t: string) => {
+    const i = (TIPOS_CONTATO as readonly string[]).indexOf(t);
+    return i === -1 ? TIPOS_CONTATO.length : i;
+  };
+  const ordenados = [...contatos].sort(
+    (a, b) => prioridade(a.tipo) - prioridade(b.tipo)
   );
+
+  // Agrupa por nome (normalizado) + whatsapp
+  const mapa = new Map<string, ContatoAgrupado>();
+  for (const c of ordenados) {
+    const key = `${c.nome.trim().toLowerCase()}|${c.whatsapp.trim()}`;
+    const papel = c.contexto ? `${c.tipo} — ${c.contexto}` : c.tipo;
+    const existente = mapa.get(key);
+    if (existente) {
+      if (!existente.papeis.includes(papel)) existente.papeis.push(papel);
+    } else {
+      mapa.set(key, {
+        nome: c.nome,
+        whatsapp: c.whatsapp,
+        tipo: c.tipo,
+        papeis: [papel],
+      });
+    }
+  }
 
   const drawHead = () => {
     drawHeader(
@@ -600,23 +637,39 @@ export async function exportContatosPdf(rows: Credenciamento[]) {
   };
 
   drawHead();
+  let y = 42;
 
-  autoTable(doc, {
-    ...tableTheme(),
-    startY: 40,
-    head: [["Nome", "WhatsApp", "Tipo", "Contexto"]],
-    body: contatos.length
-      ? contatos.map((c) => [c.nome, c.whatsapp, c.tipo, c.contexto])
-      : [["—", "—", "—", "—"]],
-    columnStyles: {
-      0: { cellWidth: 60 },
-      1: { cellWidth: 35 },
-      2: { cellWidth: 42 },
-      3: { cellWidth: "auto" },
-    },
-    margin: { left: 14, right: 14, top: 40 },
-    didDrawPage: drawHead,
-  });
+  for (const tipo of TIPOS_CONTATO) {
+    const doTipo = [...mapa.values()]
+      .filter((c) => c.tipo === tipo)
+      .sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+      );
+    if (doTipo.length === 0) continue;
+
+    y = ensureSpace(doc, y, 20, drawHead);
+    y = sectionTitle(doc, tipo, y);
+
+    autoTable(doc, {
+      ...tableTheme(),
+      startY: y,
+      head: [["Nome", "WhatsApp", "Papel(is)"]],
+      body: doTipo.map((c) => [
+        c.nome,
+        c.whatsapp,
+        c.papeis.join(" · ") || "—",
+      ]),
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: "auto" },
+      },
+      margin: { left: 14, right: 14, top: 40 },
+      didDrawPage: drawHead,
+    });
+    y = getFinalY(doc) + 8;
+  }
 
   doc.save("contatos-comvocacao.pdf");
 }
+
