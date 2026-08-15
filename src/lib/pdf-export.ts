@@ -188,7 +188,7 @@ function renderGrupo(
       startY: y,
       head: [funcaoHeader ? ["Nome completo", funcaoHeader] : ["Nome completo"]],
       body: membrosBody,
-      margin: { left: 14, right: 14 },
+      margin: { left: 14, right: 14, top: 40 },
       didDrawPage: drawHead,
     });
     y = getFinalY(doc) + 6;
@@ -202,7 +202,7 @@ function renderGrupo(
       startY: y,
       head: [["Marca / Modelo", "Cor", "Placa"]],
       body: veics.map((v) => [v.marca_modelo || "—", v.cor || "—", v.placa || "—"]),
-      margin: { left: 14, right: 14 },
+      margin: { left: 14, right: 14, top: 40 },
       didDrawPage: drawHead,
     });
     y = getFinalY(doc) + 6;
@@ -387,7 +387,7 @@ function renderOrganizationView(
         startY: y,
         head: [["Nome completo", "Função"]],
         body: membrosBanda.map((m) => [m.nome || "—", m.funcao || "—"]),
-        margin: { left: blockX, right: 14 },
+        margin: { left: blockX, right: 14, top: 40 },
         tableWidth: blockW,
         didDrawPage: drawHead,
       });
@@ -406,7 +406,7 @@ function renderOrganizationView(
           v.cor || "—",
           v.placa || "—",
         ]),
-        margin: { left: blockX, right: 14 },
+        margin: { left: blockX, right: 14, top: 40 },
         tableWidth: blockW,
         didDrawPage: drawHead,
       });
