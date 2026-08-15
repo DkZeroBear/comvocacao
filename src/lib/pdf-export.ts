@@ -259,19 +259,30 @@ function renderGrupo(
     .filter(Boolean)
     .join(" | ");
   if (obs) {
-    y = ensureSpace(doc, y, 12, drawHead);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    const obsLines: string[] = doc.splitTextToSize(
+      obs,
+      doc.internal.pageSize.getWidth() - 32
+    );
+    // rótulo + primeira(s) linha(s) devem ficar juntos
+    const needed = 4 + Math.min(obsLines.length, 3) * 4.5 + 2;
+    y = ensureSpace(doc, y, needed, drawHead);
+
     doc.setFont("helvetica", "bold");
     doc.setTextColor(COLOR_LABEL);
     doc.text("Observações / Restrições alimentares:", 16, y);
-    y += 4;
+    y += 5;
     doc.setFont("helvetica", "normal");
     doc.setTextColor(COLOR_TEXT);
-    const obsLines = doc.splitTextToSize(obs, doc.internal.pageSize.getWidth() - 32);
-    y = ensureSpace(doc, y, obsLines.length * 4 + 4, drawHead);
-    doc.text(obsLines, 16, y);
-    y += obsLines.length * 4;
+    for (const line of obsLines) {
+      y = ensureSpace(doc, y, 5, drawHead);
+      doc.text(line, 16, y);
+      y += 4.5;
+    }
   }
   return y + 6;
+
 }
 
 function renderOrganizationView(
@@ -446,19 +457,24 @@ function renderOrganizationView(
     }
 
     // Observações / restrições alimentares
-    y = ensureSpace(doc, y, 12, drawHead);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
+    const obsText = b.observacoes?.trim() || "—";
+    const lines: string[] = doc.splitTextToSize(obsText, blockW - 4);
+    y = ensureSpace(doc, y, 4 + Math.min(lines.length, 3) * 4.5 + 2, drawHead);
+    doc.setFont("helvetica", "bold");
     doc.setTextColor(COLOR_LABEL);
     doc.text("Observações / Restrições alimentares:", blockX + 2, y);
-    y += 4;
+    y += 5;
     doc.setFont("helvetica", "normal");
     doc.setTextColor(COLOR_TEXT);
-    const obsText = b.observacoes?.trim() || "—";
-    const lines = doc.splitTextToSize(obsText, blockW - 4);
-    y = ensureSpace(doc, y, lines.length * 4 + 4, drawHead);
-    doc.text(lines, blockX + 2, y);
-    y += lines.length * 4 + 6;
+    for (const line of lines) {
+      y = ensureSpace(doc, y, 5, drawHead);
+      doc.text(line, blockX + 2, y);
+      y += 4.5;
+    }
+    y += 6;
+
 
     // Linha separadora entre bandas
     doc.setDrawColor(COLOR_BORDER);
