@@ -114,6 +114,10 @@ export function useCredenciamentos() {
       return { totalEquipe, totalBanda, totalPrefeitura, totalComissao, countDia, totalVeiculos };
     }, [rows]);
 
+  const duplicatesById = useMemo(() => buildDuplicatesMap(rows), [rows]);
+
+
+
   const filtered = useMemo(() => {
     return rows.filter((r) => {
       if (filtroTipo !== "todos" && tipoKey(r) !== filtroTipo) return false;
