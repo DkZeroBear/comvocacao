@@ -94,14 +94,26 @@ function drawHeader(
   doc.text(subtitle, pageWidth - margin - 3, 27, { align: "right" });
 }
 
-function sectionTitle(doc: jsPDF, text: string, y: number): number {
+function sectionTitle(
+  doc: jsPDF,
+  text: string,
+  y: number,
+  rightText?: string
+): number {
+  const pageWidth = doc.internal.pageSize.getWidth();
   doc.setTextColor(COLOR_TITLE);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text(text, 14, y);
+  if (rightText) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(COLOR_LABEL);
+    doc.text(rightText, pageWidth - 14, y, { align: "right" });
+  }
   doc.setDrawColor(COLOR_BORDER);
   doc.setLineWidth(0.3);
-  doc.line(14, y + 1.5, doc.internal.pageSize.getWidth() - 14, y + 1.5);
+  doc.line(14, y + 1.5, pageWidth - 14, y + 1.5);
   return y + 7;
 }
 
@@ -181,17 +193,19 @@ function renderGrupo(
     // título + cabeçalho da tabela + ao menos uma linha
     y = ensureSpace(doc, y, 40, drawHead);
   }
-  y = sectionTitle(doc, label, y);
-
 
   const todosMembros = registros.flatMap((r) => r.membros || []);
   todosMembros.sort((a, b) =>
     (a.nome || "").localeCompare(b.nome || "", "pt-BR", { sensitivity: "base" })
   );
-
   const membrosBody = todosMembros.map((m) =>
     funcaoHeader ? [m.nome || "—", m.funcao || "—"] : [m.nome || "—"]
   );
+
+  // Contador "N pessoas" alinhado à direita na mesma linha do título (apenas qtdSimples)
+  const rightText = qtdSimples ? `${membrosBody.length} pessoas` : undefined;
+  y = sectionTitle(doc, label, y, rightText);
+
   if (membrosBody.length > 0) {
     at(doc, {
       ...tableTheme(),
@@ -218,18 +232,12 @@ function renderGrupo(
     y = getFinalY(doc) + 6;
   }
 
-  // Quantidade estimada x cadastrada
-  y = ensureSpace(doc, y, 8, drawHead);
-  const qtdEst = registros.reduce((a, r) => a + (r.quantidade_pessoas ?? 0), 0);
-  doc.setFontSize(9);
-  if (qtdSimples) {
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(COLOR_LABEL);
-    doc.text("Qtd. de pessoas:", 16, y);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(COLOR_TEXT);
-    doc.text(String(membrosBody.length), 51, y);
-  } else {
+  // Quantidade estimada x cadastrada (apenas para seções não-simples, ex.: Prefeitura).
+  // Nas seções qtdSimples (Equipe / Comissão) o contador já aparece no título.
+  if (!qtdSimples) {
+    y = ensureSpace(doc, y, 8, drawHead);
+    const qtdEst = registros.reduce((a, r) => a + (r.quantidade_pessoas ?? 0), 0);
+    doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(COLOR_LABEL);
     doc.text("Qtd. estimada:", 16, y);
@@ -242,8 +250,8 @@ function renderGrupo(
     doc.setFont("helvetica", "normal");
     doc.setTextColor(COLOR_TEXT);
     doc.text(String(membrosBody.length), 119, y);
+    y += 6;
   }
-  y += 6;
 
   // Observações
   const obs = registros
