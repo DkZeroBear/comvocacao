@@ -56,6 +56,8 @@ function PainelDoDia() {
     handleLogout,
     exportXlsx,
     exportPdf,
+    duplicatesById,
+
   } = useCredenciamentos();
 
   if (!authChecked) {
