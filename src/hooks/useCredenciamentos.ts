@@ -293,6 +293,8 @@ export function useCredenciamentos() {
     totalComissao,
     countDia,
     totalVeiculos,
+    duplicatesById,
+
     handleLogout,
     handleDelete,
     exportXlsx,
