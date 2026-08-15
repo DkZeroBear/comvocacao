@@ -33,6 +33,8 @@ function Admin() {
     exportXlsx,
     exportPdf,
     exportContatos,
+    duplicatesById,
+
   } = useCredenciamentos();
 
   if (!authChecked) {
