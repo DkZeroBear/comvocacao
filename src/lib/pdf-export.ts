@@ -169,10 +169,20 @@ function renderGrupo(
   label: string,
   registros: Credenciamento[],
   funcaoHeader: string | null,
-  qtdSimples = false
+  qtdSimples = false,
+  forceNewPage = false
 ): number {
-  let y = ensureSpace(doc, yStart, 20, drawHead);
+  let y = yStart;
+  if (forceNewPage) {
+    doc.addPage();
+    drawHead();
+    y = 40;
+  } else {
+    // título + cabeçalho da tabela + ao menos uma linha
+    y = ensureSpace(doc, y, 40, drawHead);
+  }
   y = sectionTitle(doc, label, y);
+
 
   const todosMembros = registros.flatMap((r) => r.membros || []);
   todosMembros.sort((a, b) =>
