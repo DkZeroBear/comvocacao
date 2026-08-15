@@ -295,17 +295,31 @@ function renderOrganizationView(
     { label: "Equipe (setor não informado)", registros: semSetor },
   ].filter((g) => g.registros.length > 0);
 
-  for (const grupo of grupos) {
-    y = renderGrupo(doc, at, y, drawHead, grupo.label, grupo.registros, "Função", true);
+  for (let i = 0; i < grupos.length; i++) {
+    const grupo = grupos[i];
+    y = renderGrupo(
+      doc,
+      at,
+      y,
+      drawHead,
+      grupo.label,
+      grupo.registros,
+      "Função",
+      true,
+      i > 0
+    );
   }
 
-
-
-
-
-  // Bandas / Artistas
-  y = ensureSpace(doc, y, 12, drawHead);
+  // Bandas / Artistas — título + primeiro bloco devem caber juntos
+  if (grupos.length > 0) {
+    doc.addPage();
+    drawHead();
+    y = 40;
+  } else {
+    y = ensureSpace(doc, y, 60, drawHead);
+  }
   y = sectionTitle(doc, "Bandas / Artistas", y);
+
 
   if (bandas.length === 0) {
     doc.setFont("helvetica", "italic");
