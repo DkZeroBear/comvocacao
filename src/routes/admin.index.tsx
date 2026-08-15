@@ -33,6 +33,8 @@ function Admin() {
     exportXlsx,
     exportPdf,
     exportContatos,
+    duplicatesById,
+
   } = useCredenciamentos();
 
   if (!authChecked) {
@@ -134,7 +136,9 @@ function Admin() {
               <CredenciamentoCard
                 key={r.id}
                 r={r}
+                duplicatas={duplicatesById[r.id]}
                 actions={
+
                   <>
                     <Button variant="ghost" size="sm" aria-label="Editar cadastro" asChild>
                       <Link to="/admin/edit/$id" params={{ id: r.id }}>

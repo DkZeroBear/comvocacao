@@ -56,6 +56,8 @@ function PainelDoDia() {
     handleLogout,
     exportXlsx,
     exportPdf,
+    duplicatesById,
+
   } = useCredenciamentos();
 
   if (!authChecked) {
@@ -166,7 +168,7 @@ function PainelDoDia() {
         ) : (
           <div className="space-y-3">
             {filtered.map((r) => (
-              <CredenciamentoCard key={r.id} r={r} />
+              <CredenciamentoCard key={r.id} r={r} duplicatas={duplicatesById[r.id]} />
             ))}
           </div>
         )}
