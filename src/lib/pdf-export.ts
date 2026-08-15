@@ -459,15 +459,16 @@ function renderOrganizationView(
     y += 6;
   }
 
-  // Prefeitura / Convidados
+  // Prefeitura / Convidados — página própria
   if (prefeitura.length > 0) {
-    y = renderGrupo(doc, at, y, drawHead, "Prefeitura / Convidados", prefeitura, "Cargo");
+    y = renderGrupo(doc, at, y, drawHead, "Prefeitura / Convidados", prefeitura, "Cargo", false, true);
   }
 
-  // Comissão Organizadora
+  // Comissão Organizadora — página própria
   if (comissao.length > 0) {
-    y = renderGrupo(doc, at, y, drawHead, "Comissão Organizadora", comissao, null, true);
+    y = renderGrupo(doc, at, y, drawHead, "Comissão Organizadora", comissao, null, true, true);
   }
+
 }
 
 
