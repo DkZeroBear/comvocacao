@@ -305,8 +305,15 @@ function renderOrganizationView(
     y += 10;
   }
 
-  for (const b of bandas) {
-    y = ensureSpace(doc, y, 50, drawHead);
+  for (let i = 0; i < bandas.length; i++) {
+    const b = bandas[i];
+    if (i > 0) {
+      doc.addPage();
+      drawHead();
+      y = 40;
+    } else {
+      y = ensureSpace(doc, y, 50, drawHead);
+    }
 
     // Bloco da banda
     const pageWidth = doc.internal.pageSize.getWidth();
