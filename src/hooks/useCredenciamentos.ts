@@ -35,6 +35,39 @@ export const tipoKey = (
 export const inDia = (r: Row, dia: string) =>
   (r.dias || []).some((d) => d.includes(dia) || d.toLowerCase().includes("ambos"));
 
+/**
+ * Marca possíveis duplicatas: registros de "Banda / Artista" ou
+ * "Prefeitura / Convidados" que compartilham o nome exato (sem normalização)
+ * com outro registro do mesmo dia. Puramente informativo.
+ */
+export function buildDuplicatesMap(rows: Row[]): Record<string, Row[]> {
+  const dias = ["15", "16"];
+  const map: Record<string, Row[]> = {};
+  const elegivel = (r: Row) =>
+    (tipoKey(r) === "banda" || tipoKey(r) === "prefeitura") && !!r.nome_banda;
+
+  for (const dia of dias) {
+    const grupos = new Map<string, Row[]>();
+    for (const r of rows) {
+      if (!elegivel(r) || !inDia(r, dia)) continue;
+      const key = `${tipoKey(r)}|${r.nome_banda}`;
+      const arr = grupos.get(key);
+      if (arr) arr.push(r);
+      else grupos.set(key, [r]);
+    }
+    for (const arr of grupos.values()) {
+      if (arr.length < 2) continue;
+      for (const r of arr) {
+        const outros = arr.filter((o) => o.id !== r.id);
+        const existente = map[r.id] || [];
+        map[r.id] = [...existente, ...outros.filter((o) => !existente.some((e) => e.id === o.id))];
+      }
+    }
+  }
+  return map;
+}
+
+
 export function useCredenciamentos() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<Row[]>([]);
