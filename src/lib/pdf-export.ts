@@ -517,15 +517,13 @@ function renderSecurityView(
     a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
   );
 
-  const body = people.map((p) => [p.nome, p.funcao, p.grupo, ""]);
+  const body = people.map((p) => [p.nome, p.funcao, p.grupo]);
 
   at(doc, {
     ...tableTheme(),
     startY: 40,
-    head: [["Nome completo", "Função", "Banda / Equipe", "Credenciado"]],
-    body: body.length
-      ? body
-      : [["—", "—", "—", ""]],
+    head: [["Nome completo", "Função", "Banda / Equipe"]],
+    body: body.length ? body : [["—", "—", "—"]],
     styles: {
       ...tableTheme().styles,
       fontSize: 11,
@@ -540,27 +538,11 @@ function renderSecurityView(
       0: { cellWidth: 70 },
       1: { cellWidth: 45 },
       2: { cellWidth: "auto" },
-      3: { cellWidth: 25, halign: "center" },
-    },
-    didParseCell: (data) => {
-      // Quadrado de checkbox na coluna "Credenciado"
-      if (data.section === "body" && data.column.index === 3) {
-        data.cell.text = [];
-      }
-    },
-    didDrawCell: (data) => {
-      if (data.section === "body" && data.column.index === 3) {
-        const size = 5;
-        const cx = data.cell.x + data.cell.width / 2 - size / 2;
-        const cy = data.cell.y + data.cell.height / 2 - size / 2;
-        doc.setDrawColor(COLOR_TEXT);
-        doc.setLineWidth(0.4);
-        doc.rect(cx, cy, size, size, "S");
-      }
     },
     margin: { left: 14, right: 14, top: 40 },
     didDrawPage: drawHead,
   });
+
 }
 
 export async function exportConvocacaoPdf(rows: Credenciamento[]) {
